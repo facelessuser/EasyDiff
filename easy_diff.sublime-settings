@@ -1,7 +1,8 @@
 {
-    //SVN path
+    // SVN path
     "svn": "",
 
+    // Git Path
     "git": "",
 
     // Use a buffer instead of the output panel
