@@ -303,7 +303,7 @@ def status(pth, ignore_externals=False, ignore_unversioned=False, depth="infinit
                 continue
             if item in attributes:
                 attributes[item].append(entry.attrib["path"])
-    elif not ignore_unversioned and re.search(br"svn: warning: '.*' is not a working copy", target.text.lstrip()) is not None:
+    elif not ignore_unversioned and re.search(r"svn: warning: '.*' is not a working copy", target.text.lstrip()) is not None:
         attributes["unversioned"].append(target.attrib["path"])
 
     return attributes
