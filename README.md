@@ -1,7 +1,8 @@
 EasyDiff
 ========
-
 Diff plugin for Sublime Text
+
+<img src="https://dl.dropboxusercontent.com/u/342698/EasyDiff/menus.png" border="0"/>
 
 Only handles UTF-8 currently.
 
