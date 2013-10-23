@@ -115,7 +115,31 @@ def diff_current(target):
     git_tree = get_git_tree(target)
 
     if git_tree is not None:
-        return gitopen(["diff", "--no-color", "-u", target], git_tree)
+        return gitopen(["diff", "--no-color", target], git_tree)
+
+
+def diff_current_staged(target):
+    """
+    Diff current file against last revision
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    git_tree = get_git_tree(target)
+
+    if git_tree is not None:
+        return gitopen(["diff", "--no-color", "--cached", target], git_tree)
+
+
+def diff_last(target):
+    """
+    Diff current file against last revision
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    git_tree = get_git_tree(target)
+
+    if git_tree is not None:
+        return gitopen(["diff", "--no-color", "HEAD^", "HEAD", target], git_tree)
 
 
 def is_versioned(target):

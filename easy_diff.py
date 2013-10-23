@@ -62,11 +62,38 @@ DIFF_MENU = '''[
     },
     {
         "caption": "EasyDiff SVN",
-        "command": "easy_diff_svn_last_rev"
+        "children":
+        [
+            {
+                "caption": "Diff",
+                "command": "easy_diff_svn"
+            },
+            {
+                "caption": "Diff Last Revision",
+                "command": "easy_diff_svn",
+                "args": {"last": true}
+            }
+        ]
     },
     {
         "caption": "EasyDiff Git",
-        "command": "easy_diff_git_last_rev"
+        "children":
+        [
+            {
+                "caption": "Diff",
+                "command": "easy_diff_git"
+            },
+            {
+                "caption": "Diff (staged for commit)",
+                "command": "easy_diff_git",
+                "args": {"staged": true}
+            },
+            {
+                "caption": "Diff Last Revision",
+                "command": "easy_diff_git",
+                "args": {"last": true}
+            }
+        ]
     },
     { "caption": "-"}
 ]
@@ -299,12 +326,15 @@ class EasyDiffCompareBothSelectionCommand(_EasyDiffCompareBothCommand, _EasyDiff
         return bool(sublime.load_settings(SETTINGS).get("use_selections", True)) and self.has_selections()
 
 
-class EasyDiffSvnLastRevCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+class EasyDiffSvnCommand(sublime_plugin.TextCommand):
+    def run(self, edit, last=False):
         name = self.view.file_name() if self.view is not None else None
         if name is not None:
             if svn.is_versioned(name):
-                result = svn.diff_current(name).decode("utf-8").replace('\r', '')
+                if last:
+                    result = svn.diff_last(name).decode("utf-8").replace('\r', '')
+                else:
+                    result = svn.diff_current(name).decode("utf-8").replace('\r', '')
                 if result == "":
                     sublime.status_message("No Difference")
                     return
@@ -338,12 +368,18 @@ class EasyDiffSvnLastRevCommand(sublime_plugin.TextCommand):
         return False
 
 
-class EasyDiffGitLastRevCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+class EasyDiffGitCommand(sublime_plugin.TextCommand):
+    def run(self, edit, last=False, staged=False):
         name = self.view.file_name() if self.view is not None else None
         if name is not None:
             if git.is_versioned(name):
-                result = git.diff_current(name).decode("utf-8").replace('\r', '')
+                if last:
+                    result = git.diff_last(name).decode("utf-8").replace('\r', '')
+                else:
+                    if staged:
+                        result = git.diff_current_staged(name).decode("utf-8").replace('\r', '')
+                    else:
+                        result = git.diff_current(name).decode("utf-8").replace('\r', '')
                 if result == "":
                     sublime.status_message("No Difference")
                     return

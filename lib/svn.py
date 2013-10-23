@@ -142,6 +142,16 @@ def diff_current(target):
     return svnopen(['diff', target])
 
 
+def diff_last(target):
+    """
+    Get SVN diff of last version
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    assert isfile(target), "%s is not a file!" % target
+    return svnopen(['diff', '-rPREV', target])
+
+
 def commit(pth, msg=""):
     """
     Commit changes
