@@ -55,7 +55,6 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
             ("-", "_"),
             (" ", "")
         ]
-        pattern = re.compile(r'.+\((.*)\)')
         encoding = self.view.encoding()
         m = re.match(r'.+\((.*)\)', encoding)
         if m is not None:
