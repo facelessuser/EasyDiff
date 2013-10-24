@@ -49,50 +49,60 @@ DIFF_MENU = '''[
             }
         ]
     },
-    %(svn)s
-    %(git)s
+    %(vc)s
     { "caption": "-"}
 ]
 '''
 
-SVN_MENU = '''{
-        "caption": "EasyDiff SVN",
+VC_MENU = '''{
+        "caption": "EasyDiff Version Control",
         "children":
         [
-            {
-                "caption": "Diff",
-                "command": "easy_diff_svn"
-            },
-            {
-                "caption": "Diff Last Revision",
-                "command": "easy_diff_svn",
-                "args": {"last": true}
-            }
+%(vc)s
         ]
     },
 '''
 
-GIT_MENU = '''{
-        "caption": "EasyDiff Git",
-        "children":
-        [
+SVN_MENU = '''
             {
-                "caption": "Diff",
+                "caption": "SVN Diff",
+                "command": "easy_diff_svn"
+            },
+            {
+                "caption": "SVN Diff Last Revision",
+                "command": "easy_diff_svn",
+                "args": {"last": true}
+            },
+            { "caption": "-"}'''
+
+GIT_MENU = '''
+            {
+                "caption": "Git Diff",
                 "command": "easy_diff_git"
             },
             {
-                "caption": "Diff (staged for commit)",
+                "caption": "Git Diff (staged for commit)",
                 "command": "easy_diff_git",
                 "args": {"staged": true}
             },
             {
-                "caption": "Diff Last Revision",
+                "caption": "Git Diff Last Revision",
                 "command": "easy_diff_git",
                 "args": {"last": true}
-            }
-        ]
-    },
-'''
+            },
+            { "caption": "-"}'''
+
+HG_MENU = '''
+            {
+                "caption": "Mercurial Diff",
+                "command": "easy_diff_hg"
+            },
+            {
+                "caption": "Mercurial Diff Last Revision",
+                "command": "easy_diff_hg",
+                "args": {"last": true}
+            },
+            { "caption": "-"}'''
 
 
 def update_menu(name="..."):
@@ -101,14 +111,24 @@ def update_menu(name="..."):
         makedirs(menu_path)
     if exists(menu_path):
         settings = load_settings()
-        svn_disabled = settings.get("svn_disabled", False)
-        git_disabled = settings.get("git_disabled", False)
+        svn_disabled = settings.get("svn_disabled", False) or settings.get("svn_hide_menu", False)
+        git_disabled = settings.get("git_disabled", False) or settings.get("git_hide_menu", False)
+        hg_disabled = settings.get("hg_disabled", False) or settings.get("hg_hide_menu", False)
         menu = join(menu_path, CONTEXT_MENU)
+        vc = []
+        if not svn_disabled:
+            vc.append(SVN_MENU)
+        if not git_disabled:
+            vc.append(GIT_MENU)
+        if not hg_disabled:
+            vc.append(HG_MENU)
+        vc_menu = None
+        if len(vc):
+            vc_menu = ",\n".join(vc)
         with open(menu, "w") as f:
             f.write(
                 DIFF_MENU % {
                     "file_name": name,
-                    "svn": "" if svn_disabled else SVN_MENU,
-                    "git": "" if git_disabled else GIT_MENU
+                    "vc": ("" if vc_menu is None else VC_MENU % {"vc": vc_menu})
                 }
             )

@@ -5,11 +5,26 @@
     // Git Path
     "git": "",
 
-    // Turn off svn menu access
+    // (Mercurial) Hg path
+    "hg": "",
+
+    // Turn off svn completely
     "svn_disabled": false,
 
-    // Turn off git menu access
+    // Turn off git completely
     "git_disabled": false,
+
+    // Turn off (Mercurial) hg completely
+    "hg_disabled": false,
+
+    // Turn off svn menu access
+    "svn_hide_menu": false,
+
+    // Turn off git menu access
+    "git_hide_menu": false,
+
+    // Turn off (Mercurial) hg menu access
+    "hg_hide_menu": false,
 
     // Use a buffer instead of the output panel
     "use_buffer": true,
