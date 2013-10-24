@@ -7,5 +7,7 @@ Diff plugin for Sublime Text
 Only handles UTF-8 currently.
 
 - Allows comparing views, selections, clipboard combinations.
-- Dynamic context menus for selecting left side and right side compare
-- Comapares current working copy against last committed revision in git and svn (must configure binary paths)
+- Dynamic context menus for selecting left side and right side compare.  Dynamic menus show what file is on *left* side.
+- Compares current working copy against last committed revision in git and svn (must configure binary paths)
+- Shows diff of last commit in git and svn
+- Shows diff of staged commits for git
