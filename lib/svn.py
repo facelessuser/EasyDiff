@@ -327,9 +327,12 @@ def is_versioned(target):
     assert exists(target), "%s does not exist!" % target
 
     versioned = False
-    entries = status(target, depth="empty")
-    if len(entries["unversioned"]) == 0:
-        versioned = True
+    try:
+        entries = status(target, depth="empty")
+        if len(entries["unversioned"]) == 0:
+            versioned = True
+    except:
+        pass
 
     return versioned
 
