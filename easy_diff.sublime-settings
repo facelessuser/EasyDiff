@@ -5,6 +5,12 @@
     // Git Path
     "git": "",
 
+    // Turn off svn menu access
+    "svn_disabled": false,
+
+    // Turn off git menu access
+    "git_disabled": false,
+
     // Use a buffer instead of the output panel
     "use_buffer": true,
 

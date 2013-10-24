@@ -7,7 +7,7 @@ License: MIT
 import sublime
 import sublime_plugin
 from os.path import basename
-from EasyDiff.easy_diff_global import load_settings, log
+from EasyDiff.easy_diff_global import load_settings, log, debug
 from EasyDiff.easy_diff_dynamic_menu import update_menu
 from EasyDiff.easy_diff import EasyDiffView, EasyDiffInput, EasyDiff
 
@@ -153,5 +153,13 @@ class EasyDiffListener(sublime_plugin.EventListener):
             update_menu()
 
 
-def plugin_loaded():
+def refresh_menu():
     update_menu()
+    debug("refresh menu")
+    settings = load_settings()
+    settings.clear_on_change('reload_basic')
+    settings.add_on_change('reload_basic', refresh_menu)
+
+
+def plugin_loaded():
+    refresh_menu()
