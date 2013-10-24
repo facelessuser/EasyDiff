@@ -9,3 +9,4 @@ Diff plugin for Sublime Text
 - Compares current working copy against last committed revision in git and svn (must configure binary paths)
 - Shows diff of last commit in git and svn
 - Shows diff of staged commits for git
+- View diffs in a view buffer or output panel
