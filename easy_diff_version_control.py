@@ -10,7 +10,8 @@ from os.path import basename
 import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 from EasyDiff.lib.multiconf import get as multiget
-from EasyDiff.easy_diff_global import load_settings, log
+from EasyDiff.easy_diff_global import load_settings, log, debug
+import re
 
 SVN_ENABLED = False
 GIT_ENABLED = False
@@ -38,8 +39,36 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
                 pass
         return False
 
+    def decode(self, result):
+        try:
+            debug("decoding with %s" % self.encoding)
+            return result.decode(self.encoding)
+        except:
+            debug("fallback to utf-8 decode")
+            return result.decode('utf-8')
+
+    def get_encoding(self):
+        encoding = self.view.encoding()
+        mapping = [
+            ("with BOM", ""),
+            ("Windows", "cp"),
+            ("-", "_"),
+            (" ", "")
+        ]
+        pattern = re.compile(r'.+\((.*)\)')
+        encoding = self.view.encoding()
+        m = re.match(r'.+\((.*)\)', encoding)
+        if m is not None:
+            encoding = m.group(1)
+
+        for item in mapping:
+            encoding = encoding.replace(item[0], item[1])
+
+        return "utf_8" if encoding in ["Undefined", "Hexidecimal"] else encoding
+
     def run(self, edit, **kwargs):
         name = self.view.file_name() if self.view is not None else None
+        self.encoding = self.get_encoding()
         if name is not None:
             result = self.get_diff(name, **kwargs)
 
@@ -77,9 +106,9 @@ class EasyDiffSvnCommand(_VersionControlDiff):
         result = None
         if self.is_versioned(name):
             if kwargs.get("last", False):
-                result = svn.diff_last(name).decode("utf-8").replace('\r', '')
+                result = self.decode(svn.diff_last(name)).replace('\r', '')
             else:
-                result = svn.diff_current(name).decode("utf-8").replace('\r', '')
+                result = self.decode(svn.diff_current(name)).replace('\r', '')
         return result
 
 
@@ -96,12 +125,12 @@ class EasyDiffGitCommand(_VersionControlDiff):
         result = None
         if git.is_versioned(name):
             if kwargs.get("last", False):
-                result = git.diff_last(name).decode("utf-8").replace('\r', '')
+                result = self.decode(git.diff_last(name)).replace('\r', '')
             else:
                 if kwargs.get("staged", False):
-                    result = git.diff_current_staged(name).decode("utf-8").replace('\r', '')
+                    result = self.decode(git.diff_current_staged(name)).replace('\r', '')
                 else:
-                    result = git.diff_current(name).decode("utf-8").replace('\r', '')
+                    result = self.decode(git.diff_current(name)).replace('\r', '')
         return result
 
 
