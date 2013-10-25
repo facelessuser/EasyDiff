@@ -63,34 +63,26 @@ def hgopen(args):
     return output[0]
 
 
-def diff_current(target):
+def diff(target, last=False):
     """
     Diff current file against last revision
     """
 
-    assert exists(target), "%s does not exist!" % target
-    return hgopen(["diff", "-p", target])
-
-
-def diff_last(target):
-    """
-    Diff current file against last revision
-    """
+    args = None
 
     assert exists(target), "%s does not exist!" % target
-
-    results = log(target, 2)
-    assert results is not None, "Failed to acquire log info!"
-    revs = []
-    for entry in results.findall('logentry'):
-        revs.append(entry.attrib["node"])
-
-    if len(revs) == 2:
-        results = hgopen(["diff", "-p", "-r", revs[1], "-r", revs[0], target])
+    if last:
+        results = log(target, 2)
+        assert results is not None, "Failed to acquire log info!"
+        revs = []
+        for entry in results.findall('logentry'):
+            revs.append(entry.attrib["node"])
+        if len(revs) == 2:
+            args = ["diff", "-p", "-r", revs[1], "-r", revs[0]]
     else:
-        results = b""
+        args = ["diff", "-p"]
 
-    return results
+    return hgopen(args + [target]) if args is not None else b""
 
 
 def log(target=None, limit=0):

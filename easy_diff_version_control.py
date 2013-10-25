@@ -105,10 +105,7 @@ class EasyDiffSvnCommand(_VersionControlDiff):
     def get_diff(self, name, **kwargs):
         result = None
         if self.is_versioned(name):
-            if kwargs.get("last", False):
-                result = self.decode(svn.diff_last(name)).replace('\r', '')
-            else:
-                result = self.decode(svn.diff_current(name)).replace('\r', '')
+            result = self.decode(svn.diff(name, last=kwargs.get("last", False))).replace('\r', '')
         return result
 
 
@@ -125,13 +122,13 @@ class EasyDiffGitCommand(_VersionControlDiff):
     def get_diff(self, name, **kwargs):
         result = None
         if git.is_versioned(name):
-            if kwargs.get("last", False):
-                result = self.decode(git.diff_last(name)).replace('\r', '')
-            else:
-                if kwargs.get("staged", False):
-                    result = self.decode(git.diff_current_staged(name)).replace('\r', '')
-                else:
-                    result = self.decode(git.diff_current(name)).replace('\r', '')
+            result = self.decode(
+                git.diff(
+                    name,
+                    last=kwargs.get("last", False),
+                    staged=kwargs.get("staged", False)
+                )
+            ).replace('\r', '')
         return result
 
 
@@ -148,10 +145,7 @@ class EasyDiffHgCommand(_VersionControlDiff):
     def get_diff(self, name, **kwargs):
         result = None
         if self.is_versioned(name):
-            if kwargs.get("last", False):
-                result = self.decode(hg.diff_last(name)).replace('\r', '')
-            else:
-                result = self.decode(hg.diff_current(name)).replace('\r', '')
+            result = self.decode(hg.diff(name, last=kwargs.get("last", False))).replace('\r', '')
         return result
 
 

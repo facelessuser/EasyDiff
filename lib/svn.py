@@ -132,24 +132,14 @@ def getrevision(pth):
     return keys.get(search_targets[0])
 
 
-def diff_current(target):
+def diff(target, last=False):
     """
     Get SVN diff of last version
     """
 
     assert exists(target), "%s does not exist!" % target
     assert isfile(target), "%s is not a file!" % target
-    return svnopen(['diff', target])
-
-
-def diff_last(target):
-    """
-    Get SVN diff of last version
-    """
-
-    assert exists(target), "%s does not exist!" % target
-    assert isfile(target), "%s is not a file!" % target
-    return svnopen(['diff', '-rPREV', target])
+    return svnopen(['diff', '-rPREV', target]) if last else svnopen(['diff', target])
 
 
 def commit(pth, msg=""):
