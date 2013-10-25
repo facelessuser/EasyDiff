@@ -175,16 +175,19 @@ def setup_vc_binaries():
         log("svn %s" % svn.version())
         SVN_ENABLED = True
     except:
+        log("svn not found or is not working!")
         pass
     try:
         log("git %s" % git.version())
         GIT_ENABLED = True
     except:
+        log("git not found or is not working!")
         pass
     try:
         log("hg %s" % hg.version())
         HG_ENABLED = True
     except:
+        log("hg not found or is not working!")
         pass
 
     settings.clear_on_change('reload_vc')
