@@ -7,7 +7,7 @@ License: MIT
 import sublime
 from os.path import join, exists
 from os import makedirs
-from EasyDiff.easy_diff_global import load_settings
+from EasyDiff.easy_diff_global import load_settings, debug
 
 MENU_FOLDER = "EasyDiff"
 CONTEXT_MENU = "Context.sublime-menu"
@@ -132,3 +132,15 @@ def update_menu(name="..."):
                     "vc": ("" if vc_menu is None else VC_MENU % {"vc": vc_menu})
                 }
             )
+
+
+def refresh_menu():
+    update_menu()
+    debug("refresh menu")
+    settings = load_settings()
+    settings.clear_on_change('reload_menu')
+    settings.add_on_change('reload_menu', refresh_menu)
+
+
+def plugin_loaded():
+    refresh_menu()

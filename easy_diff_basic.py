@@ -153,13 +153,5 @@ class EasyDiffListener(sublime_plugin.EventListener):
             update_menu()
 
 
-def refresh_menu():
-    update_menu()
-    debug("refresh menu")
-    settings = load_settings()
-    settings.clear_on_change('reload_basic')
-    settings.add_on_change('reload_basic', refresh_menu)
-
-
 def plugin_loaded():
-    refresh_menu()
+    update_menu()
