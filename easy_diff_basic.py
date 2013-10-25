@@ -117,23 +117,26 @@ class _EasyDiffCompareBothCommand(sublime_plugin.TextCommand):
         else:
             log("Can't compare")
 
+    def check_enabled(self):
+        return True
+
     def is_enabled(self):
-        return LEFT is not None and self.is_visible()
+        return LEFT is not None and self.check_enabled()
 
 
 class EasyDiffCompareBothViewCommand(_EasyDiffCompareBothCommand):
     def set_right(self):
         self.right = {"win_id": self.view.window().id(), "view_id": self.view.id(), "clip": None}
 
-    def is_visible(self):
-        return not (LEFT is not None and self.view.window().id() == LEFT["win_id"] and self.view.id() == LEFT["view_id"])
+    def check_enabled(self):
+        return not (self.view.window().id() == LEFT["win_id"] and self.view.id() == LEFT["view_id"])
 
 
 class EasyDiffCompareBothClipboardCommand(_EasyDiffCompareBothCommand):
     def set_right(self):
         self.right = {"win_id": None, "view_id": None, "clip": EasyDiffView("**clipboard**", sublime.get_clipboard())}
 
-    def is_visible(self):
+    def check_enabled(self):
         return bool(load_settings().get("use_clipboard", True))
 
 
@@ -141,7 +144,7 @@ class EasyDiffCompareBothSelectionCommand(_EasyDiffCompareBothCommand, _EasyDiff
     def set_right(self):
         self.right = {"win_id": None, "view_id": None, "clip": EasyDiffView("**selection**", self.get_selections())}
 
-    def is_visible(self):
+    def check_enabled(self):
         return bool(load_settings().get("use_selections", True)) and self.has_selections()
 
 
