@@ -9,13 +9,16 @@ DEBUG = False
 SETTINGS = "easy_diff.sublime-settings"
 
 
-def log(msg):
-    print("EasyDiff: %s" % str(msg))
+def log(msg, status=False):
+    string = str(msg)
+    print("EasyDiff: %s" % string)
+    if status:
+        sublime.status_message(string)
 
 
-def debug(msg):
+def debug(msg, status=False):
     if DEBUG:
-        log(msg)
+        log(msg, status)
 
 
 def load_settings():

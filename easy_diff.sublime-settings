@@ -26,6 +26,13 @@
     // Turn off (Mercurial) hg menu access
     "hg_hide_menu": false,
 
+    // Do not perform a version check on files
+    // when evaluating whether version control
+    // commands are enabled.  May avoid slowing
+    // down context menu draw in large version
+    // controlled projects.
+    "skip_version_check_on_is_enabled": false,
+
     // Use a buffer instead of the output panel
     "use_buffer": true,
 

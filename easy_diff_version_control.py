@@ -31,13 +31,20 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
         return False
 
     def is_enabled(self):
+        enabled = False
         name = self.view.file_name() if self.view is not None else None
         if name is not None:
             try:
-                return self.control_enabled and self.is_versioned(name)
+                enabled = (
+                    self.control_enabled and
+                    (
+                        load_settings().get("skip_version_check_on_is_enabled", False) or
+                        self.is_versioned(name)
+                    )
+                )
             except:
                 pass
-        return False
+        return enabled
 
     def decode(self, result):
         try:
@@ -106,6 +113,8 @@ class EasyDiffSvnCommand(_VersionControlDiff):
         result = None
         if self.is_versioned(name):
             result = self.decode(svn.diff(name, last=kwargs.get("last", False))).replace('\r', '')
+        else:
+            log("View not versioned under SVN!", status=True)
         return result
 
 
@@ -129,6 +138,8 @@ class EasyDiffGitCommand(_VersionControlDiff):
                     staged=kwargs.get("staged", False)
                 )
             ).replace('\r', '')
+        else:
+            log("View not versioned under Git!", Status=True)
         return result
 
 
@@ -146,6 +157,8 @@ class EasyDiffHgCommand(_VersionControlDiff):
         result = None
         if self.is_versioned(name):
             result = self.decode(hg.diff(name, last=kwargs.get("last", False))).replace('\r', '')
+        else:
+            log("View not versioned under Mercurial!", status=True)
         return result
 
 
