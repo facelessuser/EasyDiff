@@ -113,15 +113,28 @@ def diff(target, last=False, staged=False):
 
     assert exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
+    results = b""
 
     if git_tree is not None:
         args = ["diff", "--no-color"]
         if staged:
             args.append("--cached")
         elif last:
-            args.append("HEAD^")
-            args.append("HEAD")
-        return gitopen(args + [target], git_tree)
+            results = gitopen(["log", "--no-color", "--pretty=oneline", "-n", "2", target], git_tree)
+
+            revs = []
+            for m in re.finditer(br"([a-f\d]{40}) .*\r?\n", results):
+                revs.append(m.group(1).decode("utf-8"))
+
+            if len(revs) == 2:
+                args.append(revs[1])
+                args.append(revs[0])
+            else:
+                args = None
+
+        if args:
+            results = gitopen(args + [target], git_tree)
+    return results
 
 
 def is_versioned(target):
