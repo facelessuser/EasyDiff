@@ -70,7 +70,8 @@ class EasyDiffSetLeftSelectionCommand(sublime_plugin.TextCommand, _EasyDiffSelec
     def is_enabled(self):
         return bool(load_settings().get("use_selections", True)) and self.has_selections()
 
-    is_visible = is_enabled
+    def is_visible(self):
+        return bool(load_settings().get("use_selections", True))
 
 
 class _EasyDiffCompareBothCommand(sublime_plugin.TextCommand):
