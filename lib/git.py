@@ -120,10 +120,10 @@ def diff(target, last=False, staged=False):
         if staged:
             args.append("--cached")
         elif last:
-            results = gitopen(["log", "--no-color", "--pretty=oneline", "-n", "2", target], git_tree)
+            lg = gitopen(["log", "--no-color", "--pretty=oneline", "-n", "2", target], git_tree)
 
             revs = []
-            for m in re.finditer(br"([a-f\d]{40}) .*\r?\n", results):
+            for m in re.finditer(br"([a-f\d]{40}) .*\r?\n", lg):
                 revs.append(m.group(1).decode("utf-8"))
 
             if len(revs) == 2:
