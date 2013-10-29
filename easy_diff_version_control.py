@@ -56,31 +56,45 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
     def get_encoding(self):
         return get_encoding(self.view)
 
+    def internal_diff(self, name, **kwargs):
+        result = self.get_diff(name, **kwargs)
+
+        if result == "":
+            sublime.status_message("No Difference")
+            result = None
+
+        if result is not None:
+            use_buffer = bool(load_settings().get("use_buffer", False))
+
+            win = sublime.active_window()
+            if use_buffer:
+                v = win.new_file()
+                v.set_name("EasyDiff: %s (%s)" % (self.control_type, basename(name)))
+                v.set_scratch(True)
+                v.assign_syntax('Packages/Diff/Diff.tmLanguage')
+                v.run_command('append', {'characters': result})
+            else:
+                v = win.create_output_panel('easy_diff')
+                v.assign_syntax('Packages/Diff/Diff.tmLanguage')
+                v.run_command('append', {'characters': result})
+                win.run_command("show_panel", {"panel": "output.easy_diff"})
+
+    def external_diff(self, name, **kwargs):
+        raise NotImplementedError
+
     def run(self, edit, **kwargs):
         name = self.view.file_name() if self.view is not None else None
         self.encoding = self.get_encoding()
         if name is not None:
-            result = self.get_diff(name, **kwargs)
-
-            if result == "":
-                sublime.status_message("No Difference")
-                result = None
-
-            if result is not None:
-                use_buffer = bool(load_settings().get("use_buffer", False))
-
-                win = sublime.active_window()
-                if use_buffer:
-                    v = win.new_file()
-                    v.set_name("EasyDiff: %s (%s)" % (self.control_type, basename(name)))
-                    v.set_scratch(True)
-                    v.assign_syntax('Packages/Diff/Diff.tmLanguage')
-                    v.run_command('append', {'characters': result})
-                else:
-                    v = win.create_output_panel('easy_diff')
-                    v.assign_syntax('Packages/Diff/Diff.tmLanguage')
-                    v.run_command('append', {'characters': result})
-                    win.run_command("show_panel", {"panel": "output.easy_diff"})
+            external = kwargs.get("external", None)
+            if external is not None:
+                del kwargs["external"]
+            else:
+                external = False
+            if not external:
+                self.internal_diff(name, **kwargs)
+            else:
+                self.external_diff(name, **kwargs)
 
 
 class EasyDiffSvnCommand(_VersionControlDiff):
