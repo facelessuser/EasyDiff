@@ -1,4 +1,13 @@
 {
+    // Show internal diff options (Easy Diff in a view or buffer)
+    "show_internal": true,
+
+    // Show external options (options to send files to external diff tool)
+    "show_external": false,
+
+    // External diff tool path (absolute)
+    "external_diff": "",
+
     // SVN path
     "svn": "",
 

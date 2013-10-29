@@ -9,14 +9,20 @@ import time
 import difflib
 from os.path import basename
 from os import stat as osstat
-from EasyDiff.easy_diff_global import load_settings
+import tempfile
+from EasyDiff.easy_diff_global import load_settings, get_encoding
+import subprocess
 
 
 class EasyDiffView(object):
-    def __init__(self, name, content):
+    def __init__(self, name, content, encoding):
         self.filename = name
         self.content = content
         self.time = time.ctime()
+        self.encode = encoding
+
+    def encoding(self):
+        return self.encode
 
     def get_time(self):
         return self.time
@@ -29,6 +35,41 @@ class EasyDiffView(object):
 
     def size(self):
         return len(self.content)
+
+
+class EasyDiffExtInput(object):
+    def __init__(self, v1, v2):
+        untitled = False
+        self.f1 = v1.file_name()
+        if self.f1 is None:
+            untitled = True
+            self.f1 = self.create_temp(v1, "Untitled")
+            self.t1 = time.ctime()
+        elif isinstance(v1, EasyDiffView):
+            self.t1 = v1.get_time()
+            self.f1 = self.create_temp(v1, v1.file_name().replace("*", ""))
+        else:
+            self.t1 = time.ctime(osstat(self.f1).st_mtime)
+
+        self.f2 = v2.file_name()
+        if self.f2 is None:
+            self.f2 = self.create_temp(v1, "Untitled2" if untitled else "Untitled")
+            self.t2 = time.ctime()
+        elif isinstance(v2, EasyDiffView):
+            self.t2 = v2.get_time()
+            self.f2 = self.create_temp(v2, v2.file_name().replace("*", ""))
+        else:
+            self.t2 = time.ctime(osstat(self.f2).st_mtime)
+
+    def create_temp(self, v, name):
+        with tempfile.NamedTemporaryFile(delete=False, prefix=name, suffix="") as f:
+            encoding = get_encoding(v)
+            try:
+                bfr = v.substr(sublime.Region(0, v.size())).encode(encoding)
+            except:
+                bfr = v.substr(sublime.Region(0, v.size())).encode("utf-8")
+            f.write(bfr)
+        return f.name
 
 
 class EasyDiffInput(object):
@@ -57,6 +98,16 @@ class EasyDiffInput(object):
 
 
 class EasyDiff(object):
+    @classmethod
+    def extcompare(cls, inputs, ext_diff):
+        subprocess.Popen(
+            [
+                ext_diff,
+                inputs.f1,
+                inputs.f2
+            ]
+        )
+
     @classmethod
     def compare(cls, inputs):
         diff = difflib.unified_diff(

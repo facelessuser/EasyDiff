@@ -7,12 +7,21 @@ License: MIT
 import sublime
 from os.path import join, exists
 from os import makedirs
-from EasyDiff.easy_diff_global import load_settings, debug
+from EasyDiff.easy_diff_global import load_settings, debug, get_external_diff
+from EasyDiff.lib.multiconf import get as multiget
 
 MENU_FOLDER = "EasyDiff"
 CONTEXT_MENU = "Context.sublime-menu"
 DIFF_MENU = '''[
-    { "caption": "-" },
+    %(internal)s
+    %(vc_internal)s
+    %(external)s
+    %(vc_external)s
+    { "caption": "-"}
+]
+'''
+
+INTERNAL_MENU = '''{ "caption": "-" },
     {
         "caption": "EasyDiff Set Left Side",
         "children":
@@ -49,12 +58,51 @@ DIFF_MENU = '''[
             }
         ]
     },
-    %(vc)s
-    { "caption": "-"}
-]
 '''
 
-VC_MENU = '''{
+EXTERNAL_MENU = '''{ "caption": "-" },
+    {
+        "caption": "Diff Set Left Side",
+        "children":
+        [
+            {
+                "caption": "View",
+                "command": "easy_diff_set_left"
+            },
+            {
+                "caption": "Clipboard",
+                "command": "easy_diff_set_left_clipboard"
+            },
+            {
+                "caption": "Selection",
+                "command": "easy_diff_set_left_selection"
+            }
+        ]
+    },
+    {
+        "caption": "Diff Compare with \\"%(file_name)s\\"",
+        "children":
+        [
+            {
+                "caption": "View",
+                "command": "easy_diff_compare_both_view",
+                "args": {"external": true}
+            },
+            {
+                "caption": "Clipboard",
+                "command": "easy_diff_compare_both_clipboard",
+                "args": {"external": true}
+            },
+            {
+                "caption": "Selection",
+                "command": "easy_diff_compare_both_selection",
+                "args": {"external": true}
+            }
+        ]
+    },
+'''
+
+VC_INTERNAL_MENU = '''{
         "caption": "EasyDiff Version Control",
         "children":
         [
@@ -63,7 +111,16 @@ VC_MENU = '''{
     },
 '''
 
-SVN_MENU = '''
+VC_EXTERNAL_MENU = '''{
+        "caption": "Diff Version Control",
+        "children":
+        [
+%(vc)s
+        ]
+    },
+'''
+
+SVN_INTERNAL_MENU = '''
             {
                 "caption": "SVN Diff",
                 "command": "easy_diff_svn"
@@ -75,7 +132,7 @@ SVN_MENU = '''
             },
             { "caption": "-"}'''
 
-GIT_MENU = '''
+GIT_INTERNAL_MENU = '''
             {
                 "caption": "Git Diff",
                 "command": "easy_diff_git"
@@ -92,7 +149,7 @@ GIT_MENU = '''
             },
             { "caption": "-"}'''
 
-HG_MENU = '''
+HG_INTERNAL_MENU = '''
             {
                 "caption": "Mercurial Diff",
                 "command": "easy_diff_hg"
@@ -104,6 +161,47 @@ HG_MENU = '''
             },
             { "caption": "-"}'''
 
+SVN_EXTERNAL_MENU = '''
+            {
+                "caption": "SVN Diff",
+                "command": "easy_diff_svn"
+            },
+            {
+                "caption": "SVN Diff Last Revision",
+                "command": "easy_diff_svn",
+                "args": {"external": true, "last": true}
+            },
+            { "caption": "-"}'''
+
+GIT_EXTERNAL_MENU = '''
+            {
+                "caption": "Git Diff",
+                "command": "easy_diff_git"
+            },
+            {
+                "caption": "Git Diff (staged for commit)",
+                "command": "easy_diff_git",
+                "args": {"staged": true}
+            },
+            {
+                "caption": "Git Diff Last Revision",
+                "command": "easy_diff_git",
+                "args": {"external": true, "last": true}
+            },
+            { "caption": "-"}'''
+
+HG_EXTERNAL_MENU = '''
+            {
+                "caption": "Mercurial Diff",
+                "command": "easy_diff_hg"
+            },
+            {
+                "caption": "Mercurial Diff Last Revision",
+                "command": "easy_diff_hg",
+                "args": {"external": true, "last": true}
+            },
+            { "caption": "-"}'''
+
 
 def update_menu(name="..."):
     menu_path = join(sublime.packages_path(), "User", MENU_FOLDER)
@@ -111,25 +209,41 @@ def update_menu(name="..."):
         makedirs(menu_path)
     if exists(menu_path):
         settings = load_settings()
-        svn_disabled = settings.get("svn_disabled", False) or settings.get("svn_hide_menu", False)
-        git_disabled = settings.get("git_disabled", False) or settings.get("git_hide_menu", False)
-        hg_disabled = settings.get("hg_disabled", False) or settings.get("hg_hide_menu", False)
+        svn_disabled = multiget(settings, "svn_disabled", False) or multiget(settings, "svn_hide_menu", False)
+        git_disabled = multiget(settings, "git_disabled", False) or multiget(settings, "git_hide_menu", False)
+        hg_disabled = multiget(settings, "hg_disabled", False) or multiget(settings, "hg_hide_menu", False)
+        show_ext = multiget(settings, "show_external", False) and get_external_diff() is not None
+        show_int = multiget(settings, "show_internal", True)
         menu = join(menu_path, CONTEXT_MENU)
-        vc = []
-        if not svn_disabled:
-            vc.append(SVN_MENU)
-        if not git_disabled:
-            vc.append(GIT_MENU)
-        if not hg_disabled:
-            vc.append(HG_MENU)
-        vc_menu = None
-        if len(vc):
-            vc_menu = ",\n".join(vc)
+        vc_internal = []
+        vc_internal_menu = None
+        if show_int:
+            if not svn_disabled:
+                vc_internal.append(SVN_INTERNAL_MENU)
+            if not git_disabled:
+                vc_internal.append(GIT_INTERNAL_MENU)
+            if not hg_disabled:
+                vc_internal.append(HG_INTERNAL_MENU)
+            if len(vc_internal):
+                vc_internal_menu = ",\n".join(vc_internal)
+        vc_external = []
+        vc_external_menu = None
+        # if show_ext:
+        #     if not svn_disabled:
+        #         vc_external.append(SVN_MENU)
+        #     if not git_disabled:
+        #         vc_external.append(GIT_MENU)
+        #     if not hg_disabled:
+        #         vc_external.append(HG_MENU)
+        #     if len(vc_external):
+        #         vc_external_menu = ",\n".join(vc_external)
         with open(menu, "w") as f:
             f.write(
                 DIFF_MENU % {
-                    "file_name": name,
-                    "vc": ("" if vc_menu is None else VC_MENU % {"vc": vc_menu})
+                    "internal": ("" if not show_int else INTERNAL_MENU % {"file_name": name}),
+                    "external": ("" if not show_ext else EXTERNAL_MENU % {"file_name": name}),
+                    "vc_internal": ("" if vc_internal_menu is None or not show_int else VC_INTERNAL_MENU % {"vc": vc_internal_menu}),
+                    "vc_external": ("" if vc_external_menu is None or not show_ext else VC_EXTERNAL_MENU % {"vc": vc_external_menu})
                 }
             )
 

@@ -11,7 +11,7 @@ import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
 from EasyDiff.lib.multiconf import get as multiget
-from EasyDiff.easy_diff_global import load_settings, log, debug
+from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding
 import re
 import traceback
 
@@ -55,22 +55,7 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
             return result.decode('utf-8')
 
     def get_encoding(self):
-        encoding = self.view.encoding()
-        mapping = [
-            ("with BOM", ""),
-            ("Windows", "cp"),
-            ("-", "_"),
-            (" ", "")
-        ]
-        encoding = self.view.encoding()
-        m = re.match(r'.+\((.*)\)', encoding)
-        if m is not None:
-            encoding = m.group(1)
-
-        for item in mapping:
-            encoding = encoding.replace(item[0], item[1])
-
-        return "utf_8" if encoding in ["Undefined", "Hexidecimal"] else encoding
+        return get_encoding(self.view)
 
     def run(self, edit, **kwargs):
         name = self.view.file_name() if self.view is not None else None
