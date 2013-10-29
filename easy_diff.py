@@ -37,29 +37,50 @@ class EasyDiffView(object):
         return len(self.content)
 
 
-class EasyDiffExtInput(object):
-    def __init__(self, v1, v2):
-        untitled = False
-        self.f1 = v1.file_name()
-        if self.f1 is None:
-            untitled = True
-            self.f1 = self.create_temp(v1, "Untitled")
-            self.t1 = time.ctime()
-        elif isinstance(v1, EasyDiffView):
-            self.t1 = v1.get_time()
-            self.f1 = self.create_temp(v1, v1.file_name().replace("*", ""))
-        else:
-            self.t1 = time.ctime(osstat(self.f1).st_mtime)
+class EasyDiffInput(object):
+    def __init__(self, v1, v2, external=False):
+        self.untitled = False
+        index = 1
+        self.process_view(v1, index, external)
+        index = 2
+        self.process_view(v2, index, external)
 
-        self.f2 = v2.file_name()
-        if self.f2 is None:
-            self.f2 = self.create_temp(v1, "Untitled2" if untitled else "Untitled")
-            self.t2 = time.ctime()
-        elif isinstance(v2, EasyDiffView):
-            self.t2 = v2.get_time()
-            self.f2 = self.create_temp(v2, v2.file_name().replace("*", ""))
+    def process_view(self, view, index, external):
+        name = view.file_name()
+        if name is None:
+            self.set_view_buffer(view, index, self.untitled, external)
+        elif isinstance(view, EasyDiffView):
+            self.set_special(view, index, external)
         else:
-            self.t2 = time.ctime(osstat(self.f2).st_mtime)
+            self.set_view(view, index)
+
+        self.set_buffer(view, index, external)
+
+    def set_buffer(self, view, index, external):
+        setattr(
+            self, 
+            "b%d" % index, 
+            view.substr(sublime.Region(0, view.size())).splitlines() if not external else []
+        )
+
+    def set_view(self, view, index):
+        setattr(self, "f%d" % index, view.file_name())
+        setattr(self, "t%d" % index, time.ctime(osstat(view.file_name()).st_mtime))
+
+    def set_special(self, view, index, external):
+        setattr(self, "f%d" % index, view.file_name())
+        if external:
+            setattr(self, "f%d" % index, self.create_temp(view, view.file_name().replace("*", "")))
+        setattr(self, "t%d" % index, view.get_time())
+
+    def set_view_buffer(self, view, index, untitled, external):
+        setattr(
+            self,
+            "f%d" % index,
+            self.create_temp(v1, "Untitled2" if self.untitled else "Untitled") if external else "Untitled2" if self.untitled else "Untitled"
+        )
+        setattr(self, "t%d" % index, time.ctime())
+        self.untitled = True
 
     def create_temp(self, v, name):
         with tempfile.NamedTemporaryFile(delete=False, prefix=name, suffix="") as f:
@@ -70,31 +91,6 @@ class EasyDiffExtInput(object):
                 bfr = v.substr(sublime.Region(0, v.size())).encode("utf-8")
             f.write(bfr)
         return f.name
-
-
-class EasyDiffInput(object):
-    def __init__(self, v1, v2):
-        untitled = False
-        self.f1 = v1.file_name()
-        if self.f1 is None:
-            self.f1 = "Untitled"
-            untitled = True
-            self.t1 = time.ctime()
-        elif isinstance(v1, EasyDiffView):
-            self.t1 = v1.get_time()
-        else:
-            self.t1 = time.ctime(osstat(self.f1).st_mtime)
-        self.b1 = v1.substr(sublime.Region(0, v1.size())).splitlines()
-
-        self.f2 = v2.file_name()
-        if self.f2 is None:
-            self.f2 = "Untitled2" if untitled else "Untitled"
-            self.t2 = time.ctime()
-        elif isinstance(v2, EasyDiffView):
-            self.t2 = v2.get_time()
-        else:
-            self.t2 = time.ctime(osstat(self.f2).st_mtime)
-        self.b2 = v2.substr(sublime.Region(0, v2.size())).splitlines()
 
 
 class EasyDiff(object):

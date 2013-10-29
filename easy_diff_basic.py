@@ -9,7 +9,7 @@ import sublime_plugin
 from os.path import basename
 from EasyDiff.easy_diff_global import load_settings, log, debug, get_external_diff
 from EasyDiff.easy_diff_dynamic_menu import update_menu
-from EasyDiff.easy_diff import EasyDiffView, EasyDiffInput, EasyDiffExtInput, EasyDiff
+from EasyDiff.easy_diff import EasyDiffView, EasyDiffInput, EasyDiff
 
 LEFT = None
 
@@ -118,7 +118,7 @@ class _EasyDiffCompareBothCommand(sublime_plugin.TextCommand):
         if lv is not None and rv is not None:
             ext_diff = get_external_diff()
             if external:
-                EasyDiff.extcompare(EasyDiffExtInput(lv, rv), ext_diff)
+                EasyDiff.extcompare(EasyDiffInput(lv, rv, external=True), ext_diff)
             else:
                 EasyDiff.compare(EasyDiffInput(lv, rv))
         else:
