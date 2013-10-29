@@ -7,11 +7,14 @@ License: MIT
 import sublime
 import time
 import difflib
-from os.path import basename
+from os.path import basename, join, splitext
 from os import stat as osstat
 import tempfile
 from EasyDiff.easy_diff_global import load_settings, get_encoding
 import subprocess
+
+LEFT = 1
+RIGHT =2
 
 
 class EasyDiffView(object):
@@ -40,50 +43,60 @@ class EasyDiffView(object):
 class EasyDiffInput(object):
     def __init__(self, v1, v2, external=False):
         self.untitled = False
-        index = 1
-        self.process_view(v1, index, external)
-        index = 2
-        self.process_view(v2, index, external)
+        self.temp_folder = None
+        self.process_view(v1, LEFT, external)
+        self.process_view(v2, RIGHT, external)
 
-    def process_view(self, view, index, external):
+    def process_view(self, view, side, external):
+        self.side = side
         name = view.file_name()
         if name is None:
-            self.set_view_buffer(view, index, self.untitled, external)
+            self.set_view_buffer(view, self.untitled, external)
         elif isinstance(view, EasyDiffView):
-            self.set_special(view, index, external)
+            self.set_special(view, external)
         else:
-            self.set_view(view, index)
+            self.set_view(view)
 
-        self.set_buffer(view, index, external)
+        self.set_buffer(view, external)
 
-    def set_buffer(self, view, index, external):
+    def set_buffer(self, view, external):
         setattr(
-            self, 
-            "b%d" % index, 
+            self,
+            "b%d" % self.side,
             view.substr(sublime.Region(0, view.size())).splitlines() if not external else []
         )
 
-    def set_view(self, view, index):
-        setattr(self, "f%d" % index, view.file_name())
-        setattr(self, "t%d" % index, time.ctime(osstat(view.file_name()).st_mtime))
+    def set_view(self, view):
+        setattr(self, "f%d" % self.side, view.file_name())
+        setattr(self, "t%d" % self.side, time.ctime(osstat(view.file_name()).st_mtime))
 
-    def set_special(self, view, index, external):
-        setattr(self, "f%d" % index, view.file_name())
+    def set_special(self, view, external):
+        setattr(self, "f%d" % self.side, view.file_name())
         if external:
-            setattr(self, "f%d" % index, self.create_temp(view, view.file_name().replace("*", "")))
-        setattr(self, "t%d" % index, view.get_time())
+            setattr(self, "f%d" % self.side, self.create_temp(view, view.file_name().replace("*", "")))
+        setattr(self, "t%d" % self.side, view.get_time())
 
-    def set_view_buffer(self, view, index, untitled, external):
+    def set_view_buffer(self, view, untitled, external):
         setattr(
             self,
-            "f%d" % index,
+            "f%d" % self.side,
             self.create_temp(v1, "Untitled2" if self.untitled else "Untitled") if external else "Untitled2" if self.untitled else "Untitled"
         )
-        setattr(self, "t%d" % index, time.ctime())
+        setattr(self, "t%d" % self.side, time.ctime())
         self.untitled = True
 
     def create_temp(self, v, name):
-        with tempfile.NamedTemporaryFile(delete=False, prefix=name, suffix="") as f:
+        file_name = None
+        if self.temp_folder is None:
+            self.temp_folder = tempfile.mkdtemp(prefix="easydiff")
+            file_name = self.create_file(v, name)
+        else:
+            file_name = self.create_file(v, name)
+        return file_name
+
+    def create_file(self, v, name):
+        root, ext = splitext(name)
+        with open(join(self.temp_folder, "%s-%s%s" % (root, "LEFT" if self.side == LEFT else "RIGHT", ext)), "wb") as f:
             encoding = get_encoding(v)
             try:
                 bfr = v.substr(sublime.Region(0, v.size())).encode(encoding)

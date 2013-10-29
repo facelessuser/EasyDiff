@@ -10,7 +10,6 @@ from EasyDiff.lib.multiconf import get as multiget
 import re
 
 DEBUG = False
-EXTERNAL_DIFF = None
 SETTINGS = "easy_diff.sublime-settings"
 
 
@@ -32,7 +31,6 @@ def load_settings():
 
 def global_reload():
     set_debug_flag()
-    set_external_diff()
     settings = load_settings()
     settings.clear_on_change('reload_global')
     settings.add_on_change('reload_global', global_reload)
@@ -44,16 +42,6 @@ def set_debug_flag():
     DEBUG = settings.get("debug", False)
     debug("debug logging enabled")
 
-
-def set_external_diff():
-    global EXTERNAL_DIFF
-    global SHOW_EXTERNAL
-    settings = load_settings()
-    ext_diff = multiget(settings, "external_diff", None)
-    if ext_diff is None or ext_diff == "" or not exists(abspath(normpath(ext_diff))):
-        EXTERNAL_DIFF = None
-    else:
-        EXTERNAL_DIFF = abspath(normpath(ext_diff))
 
 def get_encoding(view):
     encoding = view.encoding()
@@ -75,7 +63,9 @@ def get_encoding(view):
 
 
 def get_external_diff():
-    return EXTERNAL_DIFF
+    settings = load_settings()
+    ext_diff = multiget(settings, "external_diff", None)
+    return None if ext_diff is None or ext_diff == "" or not exists(abspath(normpath(ext_diff))) else abspath(normpath(ext_diff))
 
 
 def plugin_loaded():

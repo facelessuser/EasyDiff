@@ -12,7 +12,6 @@ import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
 from EasyDiff.lib.multiconf import get as multiget
 from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding
-import re
 import traceback
 
 SVN_ENABLED = False
