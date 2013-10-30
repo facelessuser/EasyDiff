@@ -41,7 +41,7 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
                 enabled = (
                     self.control_enabled and
                     (
-                        load_settings().get("skip_version_check_on_is_enabled", False) or
+                        multiget(load_settings(), "skip_version_check_on_is_enabled", False) or
                         self.is_versioned(name)
                     )
                 )
@@ -141,7 +141,7 @@ class EasyDiffSvnCommand(_VersionControlDiff):
         return f1, f2
 
     def is_versioned(self, name):
-        disabled = load_settings().get("svn_disabled", False)
+        disabled = multiget(load_settings(), "svn_disabled", False)
         return not disabled and svn.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
@@ -187,7 +187,7 @@ class EasyDiffGitCommand(_VersionControlDiff):
         return f1, f2
 
     def is_versioned(self, name):
-        disabled = load_settings().get("git_disabled", False)
+        disabled = multiget(load_settings(), "git_disabled", False)
         return not disabled and git.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
@@ -238,7 +238,7 @@ class EasyDiffHgCommand(_VersionControlDiff):
         return f1, f2
 
     def is_versioned(self, name):
-        disabled = load_settings().get("hg_disabled", False)
+        disabled = multiget(load_settings(), "hg_disabled", False)
         return not disabled and hg.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
