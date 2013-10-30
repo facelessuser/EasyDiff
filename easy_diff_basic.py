@@ -146,6 +146,9 @@ class EasyDiffCompareBothClipboardCommand(_EasyDiffCompareBothCommand):
     def check_enabled(self):
         return bool(load_settings().get("use_clipboard", True))
 
+    def is_visible(self):
+        return self.check_enabled()
+
 
 class EasyDiffCompareBothSelectionCommand(_EasyDiffCompareBothCommand, _EasyDiffSelection):
     def set_right(self):
@@ -153,6 +156,9 @@ class EasyDiffCompareBothSelectionCommand(_EasyDiffCompareBothCommand, _EasyDiff
 
     def check_enabled(self):
         return bool(load_settings().get("use_selections", True)) and self.has_selections()
+
+    def is_visible(self):
+        return bool(load_settings().get("use_selections", True))
 
 
 class EasyDiffListener(sublime_plugin.EventListener):
