@@ -83,7 +83,7 @@ def searchinfo(xml, *args):
     Return the related info for each key in a dictionary.
     """
 
-    entry = xml.find("info").find("entry")
+    entry = xml.find("entry")
 
     if len(args) == 0:
         return {}
@@ -231,12 +231,17 @@ def update(pth):
     svnopen(['update', pth])
 
 
-def export(url, name):
+def export(url, name, rev=None):
     """
     Export file
     """
 
-    svnopen(['export', url, name])
+    args = ["export"]
+    if rev is not None:
+        args.append("-r%s" % str(rev))
+    args += [url, name]
+
+    svnopen(args)
     assert exists(name), "%s appears to not have been exported!" % name
 
 

@@ -20,6 +20,10 @@ else:
 
 _git_path = "git.exe" if _PLATFORM == "windows" else "git"
 
+# UNSTAGED_DIFF = 0
+# STAGED_DIFF = 1
+# ALL_DIFF = 2
+
 
 def is_system_root(target):
     """
@@ -106,31 +110,67 @@ def gitopen(args, git_tree=None):
     return output[0]
 
 
-def diff(target, last=False, staged=False):
+def show(target, rev):
+    """
+    Show file at revision
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    git_tree = get_git_tree(target)
+    bfr = None
+    target = target.replace(git_tree, "", 1).lstrip("\\" if _PLATFORM == "windows" else "/")
+
+    if _PLATFORM == "windows":
+        target = target.replace("\\", "/")
+    if git_tree is not None:
+        bfr = gitopen(["show", "%s:%s" % (rev, target)], git_tree)
+    return bfr
+
+
+def getrevision(target, count=1):
+    """
+    Get revision(s)
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    git_tree = get_git_tree(target)
+    revs = None
+
+    if git_tree is not None:
+        revs = []
+        lg = gitopen(["log", "--no-color", "--pretty=oneline", "-n", str(count), target], git_tree)
+        for m in re.finditer(br"([a-f\d]{40}) .*\r?\n", lg):
+            revs.append(m.group(1).decode("utf-8"))
+    return revs
+
+
+
+def diff(target, last=False):
     """
     Diff current file against last revision
     """
 
     assert exists(target), "%s does not exist!" % target
+    # assert diff_type in [ALL_DIFF, STAGED_DIFF, UNSTAGED_DIFF], "diff_type is bad!"
     git_tree = get_git_tree(target)
     results = b""
 
     if git_tree is not None:
         args = ["diff", "--no-color"]
-        if staged:
-            args.append("--cached")
-        elif last:
-            lg = gitopen(["log", "--no-color", "--pretty=oneline", "-n", "2", target], git_tree)
 
-            revs = []
-            for m in re.finditer(br"([a-f\d]{40}) .*\r?\n", lg):
-                revs.append(m.group(1).decode("utf-8"))
+        if last:
+            revs = getrevision(target, 2)
 
             if len(revs) == 2:
-                args.append(revs[1])
-                args.append(revs[0])
+                args += [revs[1], "--"]
             else:
                 args = None
+        else:
+            args += ["HEAD", "--"]
+
+        # Staged only
+        # elif diff_type == STAGED_DIFF:
+        #     args.append("--cached")
 
         if args:
             results = gitopen(args + [target], git_tree)

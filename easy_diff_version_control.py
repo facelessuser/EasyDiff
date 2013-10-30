@@ -6,13 +6,16 @@ License: MIT
 """
 import sublime
 import sublime_plugin
-from os.path import basename
+from os.path import basename, splitext, join
+from os import sep
 import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
 from EasyDiff.lib.multiconf import get as multiget
-from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding
+from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff
 import traceback
+import subprocess
+import tempfile
 
 SVN_ENABLED = False
 GIT_ENABLED = False
@@ -22,6 +25,7 @@ HG_ENABLED = False
 class _VersionControlDiff(sublime_plugin.TextCommand):
     control_type = ""
     control_enabled = False
+    temp_folder = None
 
     def get_diff(self, name, **kwargs):
         return None
@@ -79,18 +83,33 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
                 v.run_command('append', {'characters': result})
                 win.run_command("show_panel", {"panel": "output.easy_diff"})
 
+    def create_temp(self):
+        if self.temp_folder is None:
+            self.temp_folder = tempfile.mkdtemp(prefix="easydiff")
+
+    def get_files(name, **kwargs):
+        return None, None
+
     def external_diff(self, name, **kwargs):
-        raise NotImplementedError
+        self.create_temp()
+        f1, f2 = self.get_files(name, **kwargs)
+        ext_diff = get_external_diff()
+        debug(f1)
+        debug(f2)
+        if f1 is not None and f2 is not None:
+            subprocess.Popen(
+                [
+                    ext_diff,
+                    f1,
+                    f2
+                ]
+            )
 
     def run(self, edit, **kwargs):
         name = self.view.file_name() if self.view is not None else None
         self.encoding = self.get_encoding()
         if name is not None:
-            external = kwargs.get("external", None)
-            if external is not None:
-                del kwargs["external"]
-            else:
-                external = False
+            external = kwargs.get("external", False)
             if not external:
                 self.internal_diff(name, **kwargs)
             else:
@@ -102,6 +121,24 @@ class EasyDiffSvnCommand(_VersionControlDiff):
         super().__init__(edit)
         self.control_type = "SVN"
         self.control_enabled = SVN_ENABLED
+
+    def get_files(self, name, **kwargs):
+        f1 = None
+        f2 = None
+        if self.is_versioned(name):
+            f2 = name
+            root, ext = splitext(basename(name))
+            rev = None
+            if kwargs.get("last", False):
+                rev = "PREV"
+                f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
+            else:
+                rev = "BASE"
+                f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
+            svn.export(f2, f1, rev=rev)
+        else:
+            log("View not versioned under SVN!", status=True)
+        return f1, f2
 
     def is_versioned(self, name):
         disabled = load_settings().get("svn_disabled", False)
@@ -122,6 +159,33 @@ class EasyDiffGitCommand(_VersionControlDiff):
         self.control_type = "GIT"
         self.control_enabled = GIT_ENABLED
 
+    def get_files(self, name, **kwargs):
+        f1 = None
+        f2 = None
+        if self.is_versioned(name):
+            f2 = name
+            root, ext = splitext(basename(name))
+            rev = None
+            if kwargs.get("last", False):
+                revs = git.getrevision(f2, 2)
+                if revs is not None and len(revs) == 2:
+                    rev = revs[1]
+                if rev is not None:
+                    f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
+            else:
+                rev = "HEAD"
+                f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
+            if f1 is not None:
+                with open(f1, "wb") as f:
+                    bfr = git.show(f2, rev)
+                    if bfr != None:
+                        f.write(bfr)
+                    else:
+                        f1 = None
+        else:
+            log("View not versioned under Git!", status=True)
+        return f1, f2
+
     def is_versioned(self, name):
         disabled = load_settings().get("git_disabled", False)
         return not disabled and git.is_versioned(name)
@@ -132,8 +196,7 @@ class EasyDiffGitCommand(_VersionControlDiff):
             result = self.decode(
                 git.diff(
                     name,
-                    last=kwargs.get("last", False),
-                    staged=kwargs.get("staged", False)
+                    last=kwargs.get("last", False)
                 )
             ).replace('\r', '')
         else:
@@ -146,6 +209,33 @@ class EasyDiffHgCommand(_VersionControlDiff):
         super().__init__(edit)
         self.control_type = "HG"
         self.control_enabled = HG_ENABLED
+
+    def get_files(self, name, **kwargs):
+        f1 = None
+        f2 = None
+        if self.is_versioned(name):
+            f2 = name
+            root, ext = splitext(basename(name))
+            rev = None
+            if kwargs.get("last", False):
+                revs = hg.getrevision(f2, 2)
+                if revs is not None and len(revs) == 2:
+                    rev = revs[1]
+                if rev is not None:
+                    f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
+            else:
+                # Leave rev as None
+                f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, "BASE", ext))
+            if f1 is not None:
+                with open(f1, "wb") as f:
+                    bfr = hg.cat(f2, rev)
+                    if bfr != None:
+                        f.write(bfr)
+                    else:
+                        f1 = None
+        else:
+            log("View not versioned under Mercurial!", status=True)
+        return f1, f2
 
     def is_versioned(self, name):
         disabled = load_settings().get("hg_disabled", False)

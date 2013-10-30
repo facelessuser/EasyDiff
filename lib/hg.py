@@ -63,6 +63,32 @@ def hgopen(args):
     return output[0]
 
 
+def cat(target, rev=None):
+    """
+    Show file at revision
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    args = ["cat", target]
+    if rev is not None:
+        args += ["-r", str(rev)]
+    return hgopen(args)
+
+
+def getrevision(target, count=1):
+    """
+    Get revision(s)
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    results = log(target, count)
+    assert results is not None, "Failed to acquire log info!"
+    revs = []
+    for entry in results.findall('logentry'):
+        revs.append(entry.attrib["node"])
+    return revs
+
+
 def diff(target, last=False):
     """
     Diff current file against last revision
@@ -72,13 +98,9 @@ def diff(target, last=False):
 
     assert exists(target), "%s does not exist!" % target
     if last:
-        results = log(target, 2)
-        assert results is not None, "Failed to acquire log info!"
-        revs = []
-        for entry in results.findall('logentry'):
-            revs.append(entry.attrib["node"])
+        revs = getrevision(target, 2)
         if len(revs) == 2:
-            args = ["diff", "-p", "-r", revs[1], "-r", revs[0]]
+            args = ["diff", "-p", "-r", revs[1]]
     else:
         args = ["diff", "-p"]
 

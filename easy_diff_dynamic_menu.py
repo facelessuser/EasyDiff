@@ -126,7 +126,7 @@ SVN_INTERNAL_MENU = '''
                 "command": "easy_diff_svn"
             },
             {
-                "caption": "SVN Diff Last Revision",
+                "caption": "SVN Diff with Previous Revision",
                 "command": "easy_diff_svn",
                 "args": {"last": true}
             },
@@ -138,12 +138,7 @@ GIT_INTERNAL_MENU = '''
                 "command": "easy_diff_git"
             },
             {
-                "caption": "Git Diff (staged for commit)",
-                "command": "easy_diff_git",
-                "args": {"staged": true}
-            },
-            {
-                "caption": "Git Diff Last Revision",
+                "caption": "Git Diff with Previous Revision",
                 "command": "easy_diff_git",
                 "args": {"last": true}
             },
@@ -155,7 +150,7 @@ HG_INTERNAL_MENU = '''
                 "command": "easy_diff_hg"
             },
             {
-                "caption": "Mercurial Diff Last Revision",
+                "caption": "Mercurial Diff with Previous Revision",
                 "command": "easy_diff_hg",
                 "args": {"last": true}
             },
@@ -164,10 +159,11 @@ HG_INTERNAL_MENU = '''
 SVN_EXTERNAL_MENU = '''
             {
                 "caption": "SVN Diff",
-                "command": "easy_diff_svn"
+                "command": "easy_diff_svn",
+                "args": {"external": true}
             },
             {
-                "caption": "SVN Diff Last Revision",
+                "caption": "SVN Diff with Previous Revision",
                 "command": "easy_diff_svn",
                 "args": {"external": true, "last": true}
             },
@@ -176,15 +172,11 @@ SVN_EXTERNAL_MENU = '''
 GIT_EXTERNAL_MENU = '''
             {
                 "caption": "Git Diff",
-                "command": "easy_diff_git"
-            },
-            {
-                "caption": "Git Diff (staged for commit)",
                 "command": "easy_diff_git",
-                "args": {"staged": true}
+                "args": {"external": true}
             },
             {
-                "caption": "Git Diff Last Revision",
+                "caption": "Git Diff with Previous Revision",
                 "command": "easy_diff_git",
                 "args": {"external": true, "last": true}
             },
@@ -193,10 +185,11 @@ GIT_EXTERNAL_MENU = '''
 HG_EXTERNAL_MENU = '''
             {
                 "caption": "Mercurial Diff",
-                "command": "easy_diff_hg"
+                "command": "easy_diff_hg",
+                "args": {"external": true}
             },
             {
-                "caption": "Mercurial Diff Last Revision",
+                "caption": "Mercurial Diff with Previous Revision",
                 "command": "easy_diff_hg",
                 "args": {"external": true, "last": true}
             },
@@ -228,15 +221,15 @@ def update_menu(name="..."):
                 vc_internal_menu = ",\n".join(vc_internal)
         vc_external = []
         vc_external_menu = None
-        # if show_ext:
-        #     if not svn_disabled:
-        #         vc_external.append(SVN_MENU)
-        #     if not git_disabled:
-        #         vc_external.append(GIT_MENU)
-        #     if not hg_disabled:
-        #         vc_external.append(HG_MENU)
-        #     if len(vc_external):
-        #         vc_external_menu = ",\n".join(vc_external)
+        if show_ext:
+            if not svn_disabled:
+                vc_external.append(SVN_EXTERNAL_MENU)
+            if not git_disabled:
+                vc_external.append(GIT_EXTERNAL_MENU)
+            if not hg_disabled:
+                vc_external.append(HG_EXTERNAL_MENU)
+            if len(vc_external):
+                vc_external_menu = ",\n".join(vc_external)
         with open(menu, "w") as f:
             f.write(
                 DIFF_MENU % {
