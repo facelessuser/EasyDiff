@@ -110,7 +110,7 @@ Configure the external binary setting to point to diff tool binary, and then ena
 
 The external option assumes the diff the tool takes arguments as such: `tool file1 file2`.  If this is not the case, you will probably have to wrap the command in a shell script that takes the options as described, and call it directly instead.  For instance, using DeltaWalker on Mac, I copied their provided workflow configuration to a shell script, and call it directly:
 
-```shell
+```bash
 #!/bin/sh
 DW_PATH=/Applications/DeltaWalker.app/Contents/MacOS
 
