@@ -130,11 +130,11 @@ SVN_INTERNAL_MENU = '''
                 "command": "easy_diff_svn",
                 "args": {"last": true}
             },
-            // {
-            //     "caption": "SVN Revert",
-            //     "command": "easy_diff_svn",
-            //     "args": {"revert": true}
-            // },
+            {
+                "caption": "SVN Revert",
+                "command": "easy_diff_svn",
+                "args": {"revert": true}
+            },
             { "caption": "-"}'''
 
 GIT_INTERNAL_MENU = '''
@@ -147,11 +147,11 @@ GIT_INTERNAL_MENU = '''
                 "command": "easy_diff_git",
                 "args": {"last": true}
             },
-            // {
-            //     "caption": "Git Revert",
-            //     "command": "easy_diff_git",
-            //     "args": {"revert": true}
-            // },
+            {
+                "caption": "Git Revert",
+                "command": "easy_diff_git",
+                "args": {"revert": true}
+            },
             { "caption": "-"}'''
 
 HG_INTERNAL_MENU = '''
@@ -164,11 +164,11 @@ HG_INTERNAL_MENU = '''
                 "command": "easy_diff_hg",
                 "args": {"last": true}
             },
-            // {
-            //     "caption": "Mercurial Revert",
-            //     "command": "easy_diff_hg",
-            //     "args": {"revert": true}
-            // },
+            {
+                "caption": "Mercurial Revert",
+                "command": "easy_diff_hg",
+                "args": {"revert": true}
+            },
             { "caption": "-"}'''
 
 SVN_EXTERNAL_MENU = '''
@@ -182,11 +182,11 @@ SVN_EXTERNAL_MENU = '''
                 "command": "easy_diff_svn",
                 "args": {"external": true, "last": true}
             },
-            // {
-            //     "caption": "SVN Revert",
-            //     "command": "easy_diff_svn",
-            //     "args": {"revert": true}
-            // },
+            {
+                "caption": "SVN Revert",
+                "command": "easy_diff_svn",
+                "args": {"revert": true}
+            },
             { "caption": "-"}'''
 
 GIT_EXTERNAL_MENU = '''
@@ -200,11 +200,11 @@ GIT_EXTERNAL_MENU = '''
                 "command": "easy_diff_git",
                 "args": {"external": true, "last": true}
             },
-            // {
-            //     "caption": "Git Revert",
-            //     "command": "easy_diff_git",
-            //     "args": {"revert": true}
-            // },
+            {
+                "caption": "Git Revert",
+                "command": "easy_diff_git",
+                "args": {"revert": true}
+            },
             { "caption": "-"}'''
 
 HG_EXTERNAL_MENU = '''
@@ -218,11 +218,11 @@ HG_EXTERNAL_MENU = '''
                 "command": "easy_diff_hg",
                 "args": {"external": true, "last": true}
             },
-            // {
-            //     "caption": "Mercurial Revert",
-            //     "command": "easy_diff_hg",
-            //     "args": {"revert": true}
-            // },
+            {
+                "caption": "Mercurial Revert",
+                "command": "easy_diff_hg",
+                "args": {"revert": true}
+            },
             { "caption": "-"}'''
 
 
