@@ -21,7 +21,7 @@ else:
 _hg_path = "hg.exe" if _PLATFORM == "windows" else "hg"
 
 
-def hgopen(args):
+def hgopen(args, cwd=None):
     """
     Call Git with arguments
     """
@@ -43,6 +43,7 @@ def hgopen(args):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             stdin=subprocess.PIPE,
+            cwd=cwd,
             shell=False,
             env=env
         )
@@ -52,13 +53,14 @@ def hgopen(args):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             stdin=subprocess.PIPE,
+            cwd=cwd,
             shell=False,
             env=env
         )
     output = process.communicate()
     returncode = process.returncode
 
-    assert returncode == 0, "Runtime Error: %s" % output[0].rstrip()
+    assert returncode == 0, "Runtime Error: %s\n%s" % (output[0].rstrip(), str(cmd))
 
     return output[0]
 
@@ -73,6 +75,15 @@ def cat(target, rev=None):
     if rev is not None:
         args += ["-r", str(rev)]
     return hgopen(args)
+
+
+def revert(target):
+    """
+    Revert file
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    hgopen(["revert", "--no-backup", target], dirname(target))
 
 
 def getrevision(target, count=1):

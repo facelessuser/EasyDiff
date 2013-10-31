@@ -60,6 +60,31 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
     def get_encoding(self):
         return get_encoding(self.view)
 
+    def create_temp(self):
+        if self.temp_folder is None:
+            self.temp_folder = tempfile.mkdtemp(prefix="easydiff")
+
+    def get_files(name, **kwargs):
+        return None, None
+
+    def revert_file(self, name):
+        pass
+
+    def revert(self, name):
+        result = self.get_diff(name)
+
+        if result == "":
+            sublime.status_message("Nothing to Revert")
+            result = None
+
+        if result is not None and sublime.ok_cancel_dialog("Are you sure you want to revert \"%s\"?" % basename(name)):
+            try:
+                self.revert_file(name)
+            except Exception as e:
+                debug(e)
+                sublime.error_message("Could not revert \"%s\"!" % basename(name))
+
+
     def internal_diff(self, name, **kwargs):
         result = self.get_diff(name, **kwargs)
 
@@ -83,13 +108,6 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
                 v.run_command('append', {'characters': result})
                 win.run_command("show_panel", {"panel": "output.easy_diff"})
 
-    def create_temp(self):
-        if self.temp_folder is None:
-            self.temp_folder = tempfile.mkdtemp(prefix="easydiff")
-
-    def get_files(name, **kwargs):
-        return None, None
-
     def external_diff(self, name, **kwargs):
         self.create_temp()
         f1, f2 = self.get_files(name, **kwargs)
@@ -109,11 +127,14 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
         name = self.view.file_name() if self.view is not None else None
         self.encoding = self.get_encoding()
         if name is not None:
-            external = kwargs.get("external", False)
-            if not external:
-                self.internal_diff(name, **kwargs)
+            if kwargs.get("revert"):
+                self.revert(name)
             else:
-                self.external_diff(name, **kwargs)
+                external = kwargs.get("external", False)
+                if not external:
+                    self.internal_diff(name, **kwargs)
+                else:
+                    self.external_diff(name, **kwargs)
 
 
 class EasyDiffSvnCommand(_VersionControlDiff):
@@ -121,6 +142,9 @@ class EasyDiffSvnCommand(_VersionControlDiff):
         super().__init__(edit)
         self.control_type = "SVN"
         self.control_enabled = SVN_ENABLED
+
+    def revert_file(self, name):
+        svn.revert(name)
 
     def get_files(self, name, **kwargs):
         f1 = None
@@ -158,6 +182,9 @@ class EasyDiffGitCommand(_VersionControlDiff):
         super().__init__(edit)
         self.control_type = "GIT"
         self.control_enabled = GIT_ENABLED
+
+    def revert_file(self, name):
+        git.checkout(name)
 
     def get_files(self, name, **kwargs):
         f1 = None
@@ -209,6 +236,9 @@ class EasyDiffHgCommand(_VersionControlDiff):
         super().__init__(edit)
         self.control_type = "HG"
         self.control_enabled = HG_ENABLED
+
+    def revert_file(self, name):
+        hg.revert(name)
 
     def get_files(self, name, **kwargs):
         f1 = None

@@ -144,6 +144,22 @@ def getrevision(target, count=1):
     return revs
 
 
+def checkout(target, rev=None):
+    """
+    Checkout file
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    git_tree = get_git_tree(target)
+
+    if git_tree is not None:
+        args = ["checkout"]
+        if rev is not None:
+            args.append(rev)
+        args.append(target)
+
+        gitopen(args, git_tree)
+
 
 def diff(target, last=False):
     """

@@ -67,6 +67,15 @@ def svnopen(args):
     return output[0]
 
 
+def revert(target):
+    """
+    Revert file
+    """
+
+    assert exists(target), "%s does not exist!" % target
+    svnopen(["revert", target])
+
+
 def info(target):
     """
     Get general SVN info

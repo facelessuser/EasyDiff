@@ -14,7 +14,7 @@ from EasyDiff.easy_diff_global import load_settings, get_encoding
 import subprocess
 
 LEFT = 1
-RIGHT =2
+RIGHT = 2
 
 
 class EasyDiffView(object):
