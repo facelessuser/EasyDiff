@@ -227,7 +227,7 @@ class EasyDiffGitCommand(_VersionControlDiff):
                 )
             ).replace('\r', '')
         else:
-            log("View not versioned under Git!", Status=True)
+            log("View not versioned under Git!", status=True)
         return result
 
 
