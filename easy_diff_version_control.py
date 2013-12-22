@@ -112,8 +112,6 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
         self.create_temp()
         f1, f2 = self.get_files(name, **kwargs)
         ext_diff = get_external_diff()
-        debug(f1)
-        debug(f2)
         if f1 is not None and f2 is not None:
             subprocess.Popen(
                 [

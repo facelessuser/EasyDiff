@@ -65,7 +65,9 @@ def get_encoding(view):
 def get_external_diff():
     settings = load_settings()
     ext_diff = multiget(settings, "external_diff", None)
-    return None if ext_diff is None or ext_diff == "" or not exists(abspath(normpath(ext_diff))) else abspath(normpath(ext_diff))
+    diff_path = None if ext_diff is None or ext_diff == "" or not exists(abspath(normpath(ext_diff))) else abspath(normpath(ext_diff))
+    log("External diff was not found!" if diff_path is None else "External diff \"%s\" found." % diff_path)
+    return diff_path
 
 
 def plugin_loaded():
