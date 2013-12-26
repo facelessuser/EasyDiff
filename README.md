@@ -13,7 +13,7 @@ Diff plugin for Sublime Text
 - Show only interanl diff options, only external options, or show both depending on your needs and preferences.
 
 # Usage
-Easy diff is easy to use.  Simply select the `Set Left Side` option in the context menu to set what is to be compared on the left side when in a view.  Then select the what to compare to via `Compare with` menu option (select the right side view first if comparing to a view).
+Easy diff is easy to use.  Simply select the `Set Left Side` option in the context menus to set what is to be compared on the left side when in a view.  Then select the what to compare to via `Compare with` menu option (select the right side view first if comparing to a view).
 
 For version control, just select the applicable option when in a view that is versioned controlled.
 
@@ -40,10 +40,18 @@ Easy allows for diffing with the clipboard selections, and multi-selections.  Th
 ```
 
 # Dynamic Menu
-Easy diff creates a dynamic menu in `User/EasyDiff/context.sublime-menu`.  The content of this context menu changes depending on what is enabled or disabled, hidden or shown, and depending on whether a view, selection, or clipboard has been selected for left side compare.  If a view that was previously set has been closed, that view will no longer be reported in the context menu.  You can look here to see how the commands are constructed if you would like to bind the options to shortcuts or to the command palette.
+Easy diff creates a dynamic menu in `User/EasyDiff/Context.sublime-menu`, `User/EasyDiff/Tab Context.sublime-menu`, and `User/EasyDiff/Side Bar.sublime-menu`.  The content of this context menu changes depending on what is enabled or disabled, hidden or shown, and depending on whether a view, selection, or clipboard has been selected for left side compare.  If a view that was previously set has been closed, that view will no longer be reported in the context menu.  You can look here to see how the commands are constructed if you would like to bind the options to shortcuts or to the command palette.
+
+## Excluding Dynamic Menu from Certain UI Elements
+Easy diff shows access commands in the view, tab, and sidebar context menu.  If it is desired to exclude access in one of these UI elements, you can remove the element from the following setting:
+
+```javascript
+    // Menus to show (view|tab|sidebar)
+    "menu_types": ["view", "tab", "sidebar"],
+```
 
 # Version Control Setup
-EasyDiff currently supports SVN, Git, and Mercurial.  These options should only appear in the context menu if EasyDiff can find the binaries `svn`, `git`, and `hg` respectively.
+EasyDiff currently supports SVN, Git, and Mercurial.  These options should only appear in the context menus if EasyDiff can find the binaries `svn`, `git`, and `hg` respectively.
 
 If one of these options shows up, and you wish to disable them, you can go to your settings file and disable them completely with the following settings:
 

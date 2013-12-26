@@ -6,13 +6,13 @@ License: MIT
 """
 import sublime
 import sublime_plugin
-from os.path import basename, splitext, join
+from os.path import basename, splitext, join, isdir
 from os import sep
 import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
 from EasyDiff.lib.multiconf import get as multiget
-from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff
+from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff, get_target
 import traceback
 import subprocess
 import tempfile
@@ -22,7 +22,10 @@ GIT_ENABLED = False
 HG_ENABLED = False
 
 
-class _VersionControlDiff(sublime_plugin.TextCommand):
+###############################
+# Version Control Base
+###############################
+class _VersionControlDiff(object):
     control_type = ""
     control_enabled = False
     temp_folder = None
@@ -33,9 +36,8 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
     def is_versioned(self, name):
         return False
 
-    def is_enabled(self):
+    def vc_is_enabled(self, name):
         enabled = False
-        name = self.view.file_name() if self.view is not None else None
         if name is not None:
             try:
                 enabled = (
@@ -121,23 +123,71 @@ class _VersionControlDiff(sublime_plugin.TextCommand):
                 ]
             )
 
-    def run(self, edit, **kwargs):
+    def is_loaded(self):
+        if self.view.is_loading():
+            sublime.set_timeout(self.is_loaded, 100)
+        else:
+            self.diff()
+
+    def vc_run(self, **kwargs):
+        self.kwargs = kwargs
+        sublime.set_timeout(self.is_loaded, 100)
+
+    def diff(self):
         name = self.view.file_name() if self.view is not None else None
         self.encoding = self.get_encoding()
         if name is not None:
-            if kwargs.get("revert"):
+            if self.kwargs.get("revert"):
                 self.revert(name)
             else:
-                external = kwargs.get("external", False)
+                external = self.kwargs.get("external", False)
                 if not external:
-                    self.internal_diff(name, **kwargs)
+                    self.internal_diff(name, **self.kwargs)
                 else:
-                    self.external_diff(name, **kwargs)
+                    self.external_diff(name, **self.kwargs)
 
 
-class EasyDiffSvnCommand(_VersionControlDiff):
-    def __init__(self, edit):
-        super().__init__(edit)
+class _VersionControlCommand(sublime_plugin.WindowCommand):
+    def run(self, paths=[], group=-1, index=-1, **kwargs):
+        if len(paths):
+            name = get_target(paths)
+        elif index != -1:
+            self.view = sublime.active_window().views_in_group(group)[index]
+            name = self.view.file_name()
+        else:
+            self.view = self.window.active_view()
+            if self.view is None:
+                return False
+            name = self.view.file_name() if self.view is not None else None
+
+        if name is None:
+            return False
+
+        if len(paths):
+            self.view = self.window.open_file(name)
+
+        self.vc_run(**kwargs)
+
+    def is_enabled(self, paths=[], group=-1, index=-1, **kwargs):
+        if len(paths) or index != -1:
+            name = get_target(paths, group, index)
+        else:
+            self.view = self.window.active_view()
+            if self.view is None:
+                return False
+            name = self.view.file_name() if self.view is not None else None
+
+        if name is None:
+            return False
+
+        return self.vc_is_enabled(name)
+
+
+###############################
+# Version Control Specific Classes
+###############################
+class _EasyDiffSvn(_VersionControlDiff):
+    def setup(self):
         self.control_type = "SVN"
         self.control_enabled = SVN_ENABLED
 
@@ -175,9 +225,8 @@ class EasyDiffSvnCommand(_VersionControlDiff):
         return result
 
 
-class EasyDiffGitCommand(_VersionControlDiff):
-    def __init__(self, edit):
-        super().__init__(edit)
+class _EasyDiffGit(_VersionControlDiff):
+    def setup(self):
         self.control_type = "GIT"
         self.control_enabled = GIT_ENABLED
 
@@ -229,9 +278,8 @@ class EasyDiffGitCommand(_VersionControlDiff):
         return result
 
 
-class EasyDiffHgCommand(_VersionControlDiff):
-    def __init__(self, edit):
-        super().__init__(edit)
+class _EasyDiffHg(_VersionControlDiff):
+    def setup(self):
         self.control_type = "HG"
         self.control_enabled = HG_ENABLED
 
@@ -278,6 +326,30 @@ class EasyDiffHgCommand(_VersionControlDiff):
         return result
 
 
+###############################
+# Version Control Commands
+###############################
+class EasyDiffSvnCommand(_VersionControlCommand, _EasyDiffSvn):
+    def __init__(self, window):
+        super().__init__(window)
+        self.setup()
+
+
+class EasyDiffGitCommand(_VersionControlCommand, _EasyDiffGit):
+    def __init__(self, window):
+        super().__init__(window)
+        self.setup()
+
+
+class EasyDiffHgCommand(_VersionControlCommand, _EasyDiffHg):
+    def __init__(self, window):
+        super().__init__(window)
+        self.setup()
+
+
+###############################
+# Loaders
+###############################
 def setup_vc_binaries():
     global SVN_ENABLED
     global GIT_ENABLED

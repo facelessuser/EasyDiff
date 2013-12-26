@@ -5,7 +5,7 @@ Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import sublime
-from os.path import exists, normpath, abspath
+from os.path import exists, normpath, abspath, isdir
 from EasyDiff.lib.multiconf import get as multiget
 import re
 
@@ -66,8 +66,20 @@ def get_external_diff():
     settings = load_settings()
     ext_diff = multiget(settings, "external_diff", None)
     diff_path = None if ext_diff is None or ext_diff == "" or not exists(abspath(normpath(ext_diff))) else abspath(normpath(ext_diff))
-    log("External diff was not found!" if diff_path is None else "External diff \"%s\" found." % diff_path)
+    debug("External diff was not found!" if diff_path is None else "External diff \"%s\" found." % diff_path)
     return diff_path
+
+
+def get_target(paths=[], group=-1, index=-1):
+    target = None
+    if index != -1:
+        view = sublime.active_window().views_in_group(group)[index]
+        target = view.file_name()
+        if target is None:
+            target = ""
+    elif len(paths) and exists(paths[0]) and not isdir(paths[0]):
+        target = paths[0]
+    return target
 
 
 def plugin_loaded():

@@ -35,6 +35,9 @@
     // Turn off (Mercurial) hg menu access
     "hg_hide_menu": false,
 
+    // Menus to show (view|tab|sidebar)
+    "menu_types": ["view", "tab", "sidebar"],
+
     // Do not perform a version check on files
     // when evaluating whether version control
     // commands are enabled.  May avoid slowing
