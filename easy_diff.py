@@ -80,7 +80,7 @@ class EasyDiffInput(object):
         setattr(
             self,
             "f%d" % self.side,
-            self.create_temp(v1, "Untitled2" if self.untitled else "Untitled") if external else "Untitled2" if self.untitled else "Untitled"
+            self.create_temp(view, "Untitled2" if self.untitled else "Untitled") if external else "Untitled2" if self.untitled else "Untitled"
         )
         setattr(self, "t%d" % self.side, time.ctime())
         self.untitled = True
