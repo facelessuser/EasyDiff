@@ -12,7 +12,7 @@ import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
 from EasyDiff.lib.multiconf import get as multiget
-from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff, get_target
+from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff, get_target, notify
 import traceback
 import subprocess
 import tempfile
@@ -76,7 +76,7 @@ class _VersionControlDiff(object):
         result = self.get_diff(name)
 
         if result == "":
-            sublime.status_message("Nothing to Revert")
+            notify("Nothing to Revert")
             result = None
 
         if result is not None and sublime.ok_cancel_dialog("Are you sure you want to revert \"%s\"?" % basename(name)):
@@ -91,7 +91,7 @@ class _VersionControlDiff(object):
         result = self.get_diff(name, **kwargs)
 
         if result == "":
-            sublime.status_message("No Difference")
+            notify("No Difference")
             result = None
 
         if result is not None:

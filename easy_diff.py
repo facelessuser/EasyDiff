@@ -10,7 +10,7 @@ import difflib
 from os.path import basename, join, splitext
 from os import stat as osstat
 import tempfile
-from EasyDiff.easy_diff_global import load_settings, get_encoding
+from EasyDiff.easy_diff_global import load_settings, get_encoding, notify
 import subprocess
 
 LEFT = 1
@@ -128,7 +128,7 @@ class EasyDiff(object):
         result = u"\n".join(line for line in diff)
 
         if result == "":
-            sublime.status_message("No Difference")
+            notify("No Difference")
             return
 
         use_buffer = bool(load_settings().get("use_buffer", False))

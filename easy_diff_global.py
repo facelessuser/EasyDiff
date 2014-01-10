@@ -8,6 +8,13 @@ import sublime
 from os.path import exists, normpath, abspath, isdir
 from EasyDiff.lib.multiconf import get as multiget
 import re
+try:
+    from SubNotify.sub_notify import SubNotifyIsReadyCommand as Notify
+except:
+    class Notify:
+        @classmethod
+        def is_ready(cls):
+            return False
 
 DEBUG = False
 SETTINGS = "easy_diff.sublime-settings"
@@ -17,7 +24,7 @@ def log(msg, status=False):
     string = str(msg)
     print("EasyDiff: %s" % string)
     if status:
-        sublime.status_message(string)
+        notify(string)
 
 
 def debug(msg, status=False):
@@ -80,6 +87,14 @@ def get_target(paths=[], group=-1, index=-1):
     elif len(paths) and exists(paths[0]) and not isdir(paths[0]):
         target = paths[0]
     return target
+
+
+def notify(msg):
+    if load_settings().get("use_sub_notify", False) and Notify.is_ready():
+        sublime.run_command("sub_notify", {"title": "EasyDiff", "msg": msg})
+    else:
+        sublime.status_message(msg)
+
 
 
 def plugin_loaded():

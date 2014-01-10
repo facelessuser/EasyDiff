@@ -56,5 +56,7 @@
 
     // If enabled, this allows for multiple selections.
     // Each selection is separated with a new line.
-    "multi_select": false
+    "multi_select": false,
+
+    "use_sub_notify": true
 }
