@@ -6,14 +6,12 @@ License: MIT
 """
 import sublime
 import sublime_plugin
-from os.path import basename, splitext, join, isdir
-from os import sep
+from os.path import basename, splitext, join
 import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
 from EasyDiff.lib.multiconf import get as multiget
 from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff, get_target, notify
-import traceback
 import subprocess
 import tempfile
 
@@ -85,7 +83,6 @@ class _VersionControlDiff(object):
             except Exception as e:
                 debug(e)
                 sublime.error_message("Could not revert \"%s\"!" % basename(name))
-
 
     def internal_diff(self, name, **kwargs):
         result = self.get_diff(name, **kwargs)
@@ -252,7 +249,7 @@ class _EasyDiffGit(_VersionControlDiff):
             if f1 is not None:
                 with open(f1, "wb") as f:
                     bfr = git.show(f2, rev)
-                    if bfr != None:
+                    if bfr is not None:
                         f.write(bfr)
                     else:
                         f1 = None
@@ -305,7 +302,7 @@ class _EasyDiffHg(_VersionControlDiff):
             if f1 is not None:
                 with open(f1, "wb") as f:
                     bfr = hg.cat(f2, rev)
-                    if bfr != None:
+                    if bfr is not None:
                         f.write(bfr)
                     else:
                         f1 = None

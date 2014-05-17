@@ -9,7 +9,7 @@ from os import environ
 import re
 import subprocess
 import sys
-from os.path import exists, isfile, dirname, join
+from os.path import exists, dirname
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"

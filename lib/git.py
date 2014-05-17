@@ -4,7 +4,7 @@ git
 Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
-import xml.etree.ElementTree as ET
+# import xml.etree.ElementTree as ET
 from os import environ
 import re
 import subprocess

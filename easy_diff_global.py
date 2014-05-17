@@ -96,6 +96,5 @@ def notify(msg):
         sublime.status_message(msg)
 
 
-
 def plugin_loaded():
     global_reload()

@@ -7,7 +7,7 @@ License: MIT
 import sublime
 import sublime_plugin
 from os.path import basename
-from EasyDiff.easy_diff_global import load_settings, log, debug, get_external_diff, get_target
+from EasyDiff.easy_diff_global import load_settings, log, get_external_diff, get_target
 from EasyDiff.easy_diff_dynamic_menu import update_menu
 from EasyDiff.easy_diff import EasyDiffView, EasyDiffInput, EasyDiff
 
