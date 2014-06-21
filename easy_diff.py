@@ -7,7 +7,7 @@ License: MIT
 import sublime
 import time
 import difflib
-from os.path import basename, join, splitext
+from os.path import basename, join, splitext, exists
 from os import stat as osstat
 import tempfile
 from EasyDiff.easy_diff_global import load_settings, get_encoding, notify
@@ -50,7 +50,7 @@ class EasyDiffInput(object):
     def process_view(self, view, side, external):
         self.side = side
         name = view.file_name()
-        if name is None:
+        if name is None or not exists(name):
             self.set_view_buffer(view, self.untitled, external)
         elif isinstance(view, EasyDiffView):
             self.set_special(view, external)

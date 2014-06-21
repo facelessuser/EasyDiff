@@ -6,7 +6,7 @@ License: MIT
 """
 import sublime
 import sublime_plugin
-from os.path import basename, splitext, join
+from os.path import basename, splitext, join, exists
 import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
@@ -211,7 +211,8 @@ class _EasyDiffSvn(_VersionControlDiff):
 
     def is_versioned(self, name):
         disabled = multiget(load_settings(), "svn_disabled", False)
-        return not disabled and svn.is_versioned(name)
+        on_disk = exists(name)
+        return not disabled and on_disk and svn.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
         result = None
@@ -259,7 +260,8 @@ class _EasyDiffGit(_VersionControlDiff):
 
     def is_versioned(self, name):
         disabled = multiget(load_settings(), "git_disabled", False)
-        return not disabled and git.is_versioned(name)
+        on_disk = exists(name)
+        return not disabled and on_disk and git.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
         result = None
@@ -312,7 +314,8 @@ class _EasyDiffHg(_VersionControlDiff):
 
     def is_versioned(self, name):
         disabled = multiget(load_settings(), "hg_disabled", False)
-        return not disabled and hg.is_versioned(name)
+        on_disk = exists(name)
+        return not disabled and on_disk and hg.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
         result = None
