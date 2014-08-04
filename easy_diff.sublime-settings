@@ -38,6 +38,10 @@
     // Menus to show (view|tab|sidebar)
     "menu_types": ["view", "tab", "sidebar"],
 
+    // To reduce menu footprint, place diff menus under a parent item "EasyDiff"
+    // (view|tab|sidebar)
+    "submenu": [],
+
     // Do not perform a version check on files
     // when evaluating whether version control
     // commands are enabled.  May avoid slowing

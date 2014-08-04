@@ -28,6 +28,23 @@ DIFF_MENU = '''[
 ]
 '''
 
+DIFF_SUBMENU = '''
+[
+    { "caption": "-"},
+    {
+    "caption": "EasyDiff",
+    "children":
+    [
+    %(internal)s
+    %(vc_internal)s
+    %(external)s
+    %(vc_external)s
+    { "caption": "-"}
+    ]
+    }
+]
+'''
+
 VC_INTERNAL_MENU = '''{
         "caption": "EasyDiff Version Control",
         "children":
@@ -637,7 +654,7 @@ class MenuUpdater(object):
         self.show_ext = multiget(settings, "show_external", False) and get_external_diff() is not None
         self.show_int = multiget(settings, "show_internal", True)
 
-    def update_menu(self, menu_name, menus):
+    def update_menu(self, menu_name, menus, submenu):
         if exists(self.menu_path):
             menu = join(self.menu_path, menu_name)
             vc_internal = []
@@ -665,7 +682,7 @@ class MenuUpdater(object):
                     vc_external_menu = ",\n".join(vc_external)
             with open(menu, "w") as f:
                 f.write(
-                    DIFF_MENU % {
+                    (DIFF_SUBMENU if submenu else DIFF_MENU) % {
                         "internal": ("" if not self.show_int else menus["internal"] % {"file_name": self.name}),
                         "external": ("" if not self.show_ext else menus["external"] % {"file_name": self.name}),
                         "vc_internal": ("" if vc_internal_menu is None or not self.show_int else VC_INTERNAL_MENU % {"vc": vc_internal_menu}),
@@ -697,7 +714,8 @@ class MenuUpdater(object):
             }
         }
         if "view" in self.menu_types:
-            self.update_menu(CONTEXT_MENU, menus)
+            submenu = load_settings().get("submenu", [])
+            self.update_menu(CONTEXT_MENU, menus, "view" in submenu)
         else:
             self.remove_menu(CONTEXT_MENU)
 
@@ -719,7 +737,8 @@ class MenuUpdater(object):
             }
         }
         if "sidebar" in self.menu_types:
-            self.update_menu(SIDEBAR_MENU, menus)
+            submenu = load_settings().get("submenu", [])
+            self.update_menu(SIDEBAR_MENU, menus, "sidebar" in submenu)
         else:
             self.remove_menu(SIDEBAR_MENU)
 
@@ -741,7 +760,8 @@ class MenuUpdater(object):
             }
         }
         if "tab" in self.menu_types:
-            self.update_menu(TAB_MENU, menus)
+            submenu = load_settings().get("submenu", [])
+            self.update_menu(TAB_MENU, menus, "tab" in submenu)
         else:
             self.remove_menu(TAB_MENU)
 
