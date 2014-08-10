@@ -7,7 +7,7 @@ License: MIT
 import sublime
 import sublime_plugin
 from os.path import basename
-from EasyDiff.easy_diff_global import load_settings, log, get_external_diff, get_target
+from EasyDiff.easy_diff_global import load_settings, log, get_external_diff, get_target, get_group_view
 from EasyDiff.easy_diff_dynamic_menu import update_menu
 from EasyDiff.easy_diff import EasyDiffView, EasyDiffInput, EasyDiff
 
@@ -94,20 +94,21 @@ class _EasyDiffCompareBothTextCommand(sublime_plugin.TextCommand):
     def run(self, edit, external=False, group=-1, index=-1):
         if index != -1:
             # Ensure we have the correct view
-            self.view = sublime.active_window().views_in_group(group)[index]
+            self.view = get_group_view(sublime.active_window(), group, index)
         diff(self.get_right(), external=external)
 
     def view_has_selections(self, group=-1, index=-1):
         has_selections = False
         if index != -1:
-            view = sublime.active_window().views_in_group(group)[index]
-            if bool(load_settings().get("multi_select", False)):
-                for sel in view.sel():
-                    if sel.size() > 0:
-                        has_selections = True
-                        break
-            else:
-                has_selections = len(view.sel()) == 1 and view.sel()[0].size() > 0
+            view = get_group_view(sublime.active_window(), group, index)
+            if view is not None:
+                if bool(load_settings().get("multi_select", False)):
+                    for sel in view.sel():
+                        if sel.size() > 0:
+                            has_selections = True
+                            break
+                else:
+                    has_selections = len(view.sel()) == 1 and view.sel()[0].size() > 0
         else:
             has_selections = self.has_selections()
         return has_selections
@@ -152,7 +153,7 @@ class _EasyDiffCompareBothWindowCommand(sublime_plugin.WindowCommand):
             if open_file:
                 self.view = self.window.open_file(file_path)
         elif index != -1:
-            self.view = self.window.views_in_group(group)[index]
+            self.view = get_group_view(self.window, group, index)
         else:
             self.view = self.window.active_view()
 
@@ -189,7 +190,7 @@ class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand):
             if open_file:
                 self.view = self.window.open_file(file_path)
         elif index != -1:
-            self.view = self.window.views_in_group(group)[index]
+            self.view = get_group_view(self.window, group, index)
         else:
             self.view = self.window.active_view()
 
@@ -247,21 +248,22 @@ class EasyDiffSetLeftSelectionCommand(sublime_plugin.TextCommand, _EasyDiffSelec
         global LEFT
         if index != -1:
             # Ensure we have the correct view
-            self.view = sublime.active_window().views_in_group(group)[index]
+            self.view = get_group_view(sublime.active_window(), group, index)
         LEFT = {"win_id": None, "view_id": None, "clip": EasyDiffView("**selection**", self.get_selections(), self.get_encoding())}
         update_menu("**selection**")
 
     def view_has_selections(self, group=-1, index=-1):
         has_selections = False
         if index != -1:
-            view = sublime.active_window().views_in_group(group)[index]
-            if bool(load_settings().get("multi_select", False)):
-                for sel in view.sel():
-                    if sel.size() > 0:
-                        has_selections = True
-                        break
-            else:
-                has_selections = len(view.sel()) == 1 and view.sel()[0].size() > 0
+            view = get_group_view(sublime.active_window(), group, index)
+            if view is not None:
+                if bool(load_settings().get("multi_select", False)):
+                    for sel in view.sel():
+                        if sel.size() > 0:
+                            has_selections = True
+                            break
+                else:
+                    has_selections = len(view.sel()) == 1 and view.sel()[0].size() > 0
         else:
             has_selections = self.has_selections()
         return has_selections

@@ -11,7 +11,7 @@ import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
 from EasyDiff.lib.multiconf import get as multiget
-from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff, get_target, notify
+from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff, get_target, notify, get_group_view
 import subprocess
 import tempfile
 
@@ -149,7 +149,7 @@ class _VersionControlCommand(sublime_plugin.WindowCommand):
         if len(paths):
             name = get_target(paths)
         elif index != -1:
-            self.view = sublime.active_window().views_in_group(group)[index]
+            self.view = get_group_view(sublime.active_window(), group, index)
             name = self.view.file_name()
         else:
             self.view = self.window.active_view()

@@ -16,8 +16,36 @@ except:
         def is_ready(cls):
             return False
 
+
 DEBUG = False
 SETTINGS = "easy_diff.sublime-settings"
+
+try:
+    # If TabsExtra is installed, we want to use its "get_group_view"
+    # This will keep from messing up our TabsExtra activation tracker by disabling
+    # timestamps when refocusing our view when we try to resolve sheet index
+    # with view index.
+    from TabsExtra.tabs_extra import get_group_view
+except:
+    # TabsExtra is not available.  Do not worry about activation trackers.
+    def get_group_view(window, group, index):
+        """
+        Get the view at the given index in the given group.
+        """
+
+        active_sheet = window.active_sheet()
+        sheets = window.sheets_in_group(int(group))
+        if index < len(sheets):
+            sheet = sheets[index]
+        else:
+            sheet = None
+        if sheet is not None:
+            window.focus_sheet(sheet)
+            view = window.active_view()
+
+        window.focus_sheet(active_sheet)
+
+        return view
 
 
 def log(msg, status=False):
@@ -80,10 +108,11 @@ def get_external_diff():
 def get_target(paths=[], group=-1, index=-1):
     target = None
     if index != -1:
-        view = sublime.active_window().views_in_group(group)[index]
-        target = view.file_name()
-        if target is None:
-            target = ""
+        view = get_group_view(sublime.active_window(), group, index)
+        if view is not None:
+            target = view.file_name()
+            if target is None:
+                target = ""
     elif len(paths) and exists(paths[0]) and not isdir(paths[0]):
         target = paths[0]
     return target
