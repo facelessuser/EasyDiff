@@ -1,6 +1,6 @@
 # EasyDiff
 
-Diff plugin for Sublime Text
+Diff plugin for Sublime Text 3
 
 <img src="https://dl.dropboxusercontent.com/u/342698/EasyDiff/menus.png" border="0"/>
 
