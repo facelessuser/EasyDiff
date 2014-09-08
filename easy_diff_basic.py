@@ -18,6 +18,10 @@ LEFT = None
 # Helper Functions
 ###############################
 def diff(right, external=False):
+    """
+    Initiate diff by getting left side and right side compare.
+    Call the appropriate diff method and call internal or external diff.
+    """
     lw = None
     rw = None
     lv = None
@@ -287,21 +291,330 @@ class EasyDiffCompareBothSelectionCommand(_EasyDiffCompareBothTextCommand, _Easy
 
 
 ###############################
+# MRU Tab Command
+###############################
+class EasyDiffMruPanelCompareCommand(sublime_plugin.WindowCommand):
+    def run(self, method="view", external=False):
+        if method == "view":
+            self.window.run_command(
+                "easy_diff_set_left",
+                {"group": EasyDiffListener.last[0], "index": EasyDiffListener.last[1]}
+            )
+            self.window.run_command(
+                "easy_diff_compare_both_view",
+                {"external": external}
+            )
+        elif method == "selection":
+            self.window.run_command(
+                "easy_diff_set_left_selection",
+                {"group": EasyDiffListener.last[0], "index": EasyDiffListener.last[1]}
+            )
+            self.window.run_command(
+                "easy_diff_compare_both_selection",
+                {"external": external}
+            )
+        elif method == "clipboard":
+            self.window.run_command(
+                "easy_diff_set_left",
+                {"group": EasyDiffListener.last[0], "index": EasyDiffListener.last[1]}
+            )
+            self.window.run_command(
+                "easy_diff_compare_both_clipboard",
+                {"external": external}
+            )
+        elif method == "clipboard_selection":
+            self.window.run_command(
+                "easy_diff_set_left_selection",
+                {"group": EasyDiffListener.last[0], "index": EasyDiffListener.last[1]}
+            )
+            self.window.run_command(
+                "easy_diff_compare_both_clipboard",
+                {"external": external}
+            )
+
+    @staticmethod
+    def enable_check(method="view", external=False):
+        allow = bool(load_settings().get("last_activated_commands", True))
+        enabled = False
+        if method == "view":
+            enabled = (
+                allow and
+                bool(EasyDiffListener.current and EasyDiffListener.last)
+            )
+        elif method == "selection":
+            enabled = (
+                allow and
+                bool(load_settings().get("use_selections", True)) and
+                bool(EasyDiffListener.current and EasyDiffListener.last)
+            )
+        elif method == "clipboard":
+            enabled = (
+                allow and
+                bool(load_settings().get("use_clipboard", True)) and
+                bool(EasyDiffListener.last)
+            )
+        elif method == "clipboard_selection":
+            enabled = (
+                allow and
+                bool(load_settings().get("use_clipboard", True)) and
+                bool(load_settings().get("use_selections", True)) and
+                bool(EasyDiffListener.last)
+            )
+        if external:
+            enabled = (
+                enabled and
+                bool(load_settings().get("show_external", True)) and
+                get_external_diff() is not None
+            )
+        else:
+            enabled = (
+                enabled and
+                bool(load_settings().get("show_internal", True))
+            )
+        return enabled
+
+    def is_enabled(self, method="view", external=False):
+        return self.enable_check(method, external)
+
+
+###############################
+# Quick Panel Diff
+###############################
+PANEL_ENTRIES = [
+    {
+        "caption": "Set Left Side",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_panel_set_left", {"external": external}),
+        "condition": lambda self, external: bool(load_settings().get("quick_panel_left_right_commands", True))
+    },
+    {
+        "caption": "Compare with %(file)s ...",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_panel_compare", {"external": external}),
+        "condition": lambda self, external: LEFT is not None and bool(load_settings().get("quick_panel_left_right_commands", True))
+    },
+    {
+        "caption": "Compare Last Active with Current Tab",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_mru_panel_compare", {"method": "view", "external": external}),
+        "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(method="view", external=external)
+    },
+    {
+        "caption": "Compare Last Active with Current Tab Selection(s)",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_mru_panel_compare", {"method": "selection", "external": external}),
+        "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(method="selection", external=external)
+    },
+    {
+        "caption": "Compare Last Active Tab with Clipboard",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_mru_panel_compare", {"method": "clipboard", "external": external}),
+        "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(method="clipboard", external=external)
+    },
+    {
+        "caption": "Compare Last Active Tab Selection(s) with Clipboard",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_mru_panel_compare", {"method": "clipboard_selection", "external": external}),
+        "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(method="clipboard_selection", external=external)
+    },
+    {
+        "caption": "SVN Diff",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_svn", {"external": external}),
+        "condition": lambda self, external: not bool(load_settings().get("svn_disabled", False))
+    },
+    {
+        "caption": "SVN Diff with Previous Revision",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_svn", {"external": external, "last": True}),
+        "condition": lambda self, external: not bool(load_settings().get("svn_disabled", False))
+    },
+    {
+        "caption": "SVN Revert",
+        "cmd": lambda self, external: self.view.run_command("easy_diff_svn", {"revert": True}),
+        "condition": lambda self, external: not bool(load_settings().get("svn_disabled", False))
+    },
+    {
+        "caption": "GIT Diff",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_git", {"external": external}),
+        "condition": lambda self, external: not bool(load_settings().get("git_disabled", False))
+    },
+    {
+        "caption": "GIT Diff with Previous Revision",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_git", {"external": external, "last": True}),
+        "condition": lambda self, external: not bool(load_settings().get("git_disabled", False))
+    },
+    {
+        "caption": "GIT Revert",
+        "cmd": lambda self, external: self.view.run_command("easy_diff_git", {"revert": True}),
+        "condition": lambda self, external: not bool(load_settings().get("git_disabled", False))
+    },
+    {
+        "caption": "Mercurial Diff",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_hg", {"external": external}),
+        "condition": lambda self, external: not bool(load_settings().get("hg_disabled", False))
+    },
+    {
+        "caption": "Mercurial Diff with Previous Revision",
+        "cmd": lambda self, external: self.view.window().run_command("easy_diff_hg", {"external": external, "last": True}),
+        "condition": lambda self, external: not bool(load_settings().get("hg_disabled", False))
+    },
+    {
+        "caption": "Mercurial Revert",
+        "cmd": lambda self, external: self.view.run_command("easy_diff_hg", {"revert": True}),
+        "condition": lambda self, external: not bool(load_settings().get("hg_disabled", False))
+    },
+]
+
+
+class EasyDiffPanelCommand(sublime_plugin.TextCommand):
+    def run(self, edit, external=False):
+        global LEFT
+        self.external = external
+        self.menu_options = []
+        self.menu_callback = []
+        if (
+            (not external and bool(load_settings().get("show_internal", True))) or
+            (external and bool(load_settings().get("show_external", True)))
+        ):
+            left_name = self.get_left_name()
+            for entry in PANEL_ENTRIES:
+                if entry["condition"](self, external):
+                    self.menu_options.append(entry["caption"] % {"file": left_name})
+                    self.menu_callback.append(entry["cmd"])
+        if len(self.menu_options) > 1:
+            self.view.window().show_quick_panel(self.menu_options, self.check_selection)
+        elif len(self.menu_options) == 1:
+            self.check_selection(0)
+
+    def get_left_name(self):
+        global LEFT
+        name = None
+        if LEFT is not None:
+            left = LEFT.get("clip")
+            name = None
+            if left is not None:
+                name = left.file_name()
+            else:
+                win_id = LEFT.get("win_id")
+                view_id = LEFT.get("view_id")
+                window = None
+                view = None
+                for w in sublime.windows():
+                    if w.id() == win_id:
+                        window = w
+                if window is not None:
+                    for v in window.views():
+                        if v.id() == view_id:
+                            view = v
+                if view is not None:
+                    name = view.file_name()
+                    if name is None:
+                        name = "Untitled"
+                    else:
+                        name = basename(name)
+        return name
+
+    def check_selection(self, value):
+        if value != -1:
+            callback = self.menu_callback[value]
+            sublime.set_timeout(lambda: callback(self, self.external), 0)
+
+    def is_enabled(self, external=False):
+        return (
+            (not external and bool(load_settings().get("show_internal", True))) or
+            (external and bool(load_settings().get("show_external", True)))
+        ) and bool(load_settings().get("quick_panel_commands", True))
+
+
+class EasyDiffPanelSetLeftCommand(sublime_plugin.TextCommand):
+    def run(self, edit, external):
+        self.menu_options = ["View"]
+        if bool(load_settings().get("use_selections", True)):
+            self.menu_options.append("Selection(s)")
+        if bool(load_settings().get("use_clipboard", True)):
+            self.menu_options.append("Clipboard")
+        if len(self.menu_options) > 1:
+            self.view.window().show_quick_panel(self.menu_options, self.check_selection)
+        else:
+            self.check_selection(0)
+
+    def check_selection(self, value):
+        if value != -1:
+            option = self.menu_options[value]
+            if option == "View":
+                self.view.window().run_command("easy_diff_set_left")
+            elif option == "Selection(s)":
+                self.view.window().run_command("easy_diff_set_left_selection")
+            elif option == "Clipboard":
+                self.view.window().run_command("easy_diff_set_left_clipboard")
+
+    def is_enabled(self, external):
+        enabled = False
+        if not external and bool(load_settings().get("show_internal", True)):
+            enabled = True
+        elif external and bool(load_settings().get("show_external", True)):
+            enabled = True
+        return enabled
+
+
+class EasyDiffPanelCompareCommand(sublime_plugin.TextCommand):
+    def run(self, edit, external):
+        self.external = external
+        self.menu_options = ["View"]
+        if bool(load_settings().get("use_selections", True)):
+            self.menu_options.append("Selection(s)")
+        if bool(load_settings().get("use_clipboard", True)):
+            self.menu_options.append("Clipboard")
+        if len(self.menu_options) > 1:
+            self.view.window().show_quick_panel(self.menu_options, self.check_selection)
+        else:
+            self.check_selection(0)
+
+    def check_selection(self, value):
+        if value != -1:
+            option = self.menu_options[value]
+            if option == "View":
+                self.view.window().run_command("easy_diff_compare_both_view", {"external": self.external})
+            elif option == "Selection(s)":
+                self.view.window().run_command("easy_diff_compare_both_selection", {"external": self.external})
+            elif option == "Clipboard":
+                self.view.window().run_command("easy_diff_compare_both_clipboard", {"external": self.external})
+
+    def is_enabled(self, external):
+        global LEFT
+        enabled = False
+        if not external and bool(load_settings().get("show_internal", True)):
+            enabled = True
+        elif external and bool(load_settings().get("show_external", True)):
+            enabled = True
+        return LEFT is not None and enabled
+
+
+###############################
 # View Close Listener
 ###############################
 class EasyDiffListener(sublime_plugin.EventListener):
+    current = None
+    last = None
+
     def on_close(self, view):
+        """ Update menu on view close """
         global LEFT
         vid = view.id()
         if LEFT is not None and vid == LEFT["view_id"]:
             LEFT = None
             update_menu()
 
+    def on_activated(self, view):
+        """ Track last activated view """
+        cls = EasyDiffListener
+        window = view.window()
+        sheet = window.active_sheet()
+        group, index = window.get_sheet_index(sheet)
+        if group != -1:
+            if (group, index) != cls.current:
+                cls.last = cls.current
+                cls.current = (group, index)
+
 
 ###############################
 # Loaders
 ###############################
 def basic_reload():
+    """ Reload on settings change """
     global LEFT
     LEFT = None
     update_menu()
@@ -311,4 +624,5 @@ def basic_reload():
 
 
 def plugin_loaded():
+    """ Plugin reload """
     basic_reload()

@@ -1,0 +1,12 @@
+[
+    {
+        "caption": "EasyDiff: Menu",
+        "command": "easy_diff_panel",
+        "args": {"external": false}
+    },
+    {
+        "caption": "Diff: Menu",
+        "command": "easy_diff_panel",
+        "args": {"external": true}
+    }
+]
