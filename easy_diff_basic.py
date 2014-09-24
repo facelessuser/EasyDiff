@@ -316,7 +316,7 @@ class EasyDiffMruPanelCompareCommand(sublime_plugin.WindowCommand):
         elif method == "clipboard":
             self.window.run_command(
                 "easy_diff_set_left",
-                {"group": EasyDiffListener.last[0], "index": EasyDiffListener.last[1]}
+                {"group": EasyDiffListener.current[0], "index": EasyDiffListener.current[1]}
             )
             self.window.run_command(
                 "easy_diff_compare_both_clipboard",
@@ -325,7 +325,7 @@ class EasyDiffMruPanelCompareCommand(sublime_plugin.WindowCommand):
         elif method == "clipboard_selection":
             self.window.run_command(
                 "easy_diff_set_left_selection",
-                {"group": EasyDiffListener.last[0], "index": EasyDiffListener.last[1]}
+                {"group": EasyDiffListener.current[0], "index": EasyDiffListener.current[1]}
             )
             self.window.run_command(
                 "easy_diff_compare_both_clipboard",
@@ -402,12 +402,12 @@ PANEL_ENTRIES = [
         "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(method="selection", external=external)
     },
     {
-        "caption": "Compare Last Active Tab with Clipboard",
+        "caption": "Compare Current Tab with Clipboard",
         "cmd": lambda self, external: self.view.window().run_command("easy_diff_mru_panel_compare", {"method": "clipboard", "external": external}),
         "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(method="clipboard", external=external)
     },
     {
-        "caption": "Compare Last Active Tab Selection(s) with Clipboard",
+        "caption": "Compare Current Tab Selection(s) with Clipboard",
         "cmd": lambda self, external: self.view.window().run_command("easy_diff_mru_panel_compare", {"method": "clipboard_selection", "external": external}),
         "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(method="clipboard_selection", external=external)
     },
