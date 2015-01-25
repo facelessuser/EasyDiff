@@ -602,12 +602,13 @@ class EasyDiffListener(sublime_plugin.EventListener):
         """ Track last activated view """
         cls = EasyDiffListener
         window = view.window()
-        sheet = window.active_sheet()
-        group, index = window.get_sheet_index(sheet)
-        if group != -1:
-            if (group, index) != cls.current:
-                cls.last = cls.current
-                cls.current = (group, index)
+        if window is not None:
+            sheet = window.active_sheet()
+            group, index = window.get_sheet_index(sheet)
+            if group != -1:
+                if (group, index) != cls.current:
+                    cls.last = cls.current
+                    cls.current = (group, index)
 
 
 ###############################
