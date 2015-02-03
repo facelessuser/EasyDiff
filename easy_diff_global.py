@@ -19,6 +19,7 @@ except:
 
 DEBUG = False
 SETTINGS = "easy_diff.sublime-settings"
+SHEET_WORKAROUND = int(sublime.version()) < 3068
 
 try:
     # If TabsExtra is installed, we want to use its "get_group_view"
@@ -33,17 +34,22 @@ except:
         Get the view at the given index in the given group.
         """
 
-        active_sheet = window.active_sheet()
+        if SHEET_WORKAROUND:
+            active_sheet = window.active_sheet()
         sheets = window.sheets_in_group(int(group))
         if index < len(sheets):
             sheet = sheets[index]
         else:
             sheet = None
         if sheet is not None:
-            window.focus_sheet(sheet)
-            view = window.active_view()
+            if SHEET_WORKAROUND:
+                window.focus_sheet(sheet)
+                view = window.active_view()
+            else:
+                view = sheet.view()
 
-        window.focus_sheet(active_sheet)
+        if SHEET_WORKAROUND:
+            window.focus_sheet(active_sheet)
 
         return view
 
