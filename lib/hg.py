@@ -74,7 +74,7 @@ def cat(target, rev=None):
     args = ["cat", target]
     if rev is not None:
         args += ["-r", str(rev)]
-    return hgopen(args)
+    return hgopen(args, dirname(target))
 
 
 def revert(target):
@@ -115,7 +115,7 @@ def diff(target, last=False):
     else:
         args = ["diff", "-p"]
 
-    return hgopen(args + [target]) if args is not None else b""
+    return hgopen(args + [target], dirname(target)) if args is not None else b""
 
 
 def log(target=None, limit=0):
@@ -131,7 +131,7 @@ def log(target=None, limit=0):
         args.append(str(limit))
     if target is not None:
         args.append(target)
-    output = hgopen(args)
+    output = hgopen(args, dirname(target))
 
     if output != "":
         results = ET.fromstring(output)
