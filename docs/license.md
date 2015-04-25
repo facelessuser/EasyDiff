@@ -1,4 +1,7 @@
-# License
+# License {: .doctitle}
+
+---
+
 EasyDiff is released under the MIT license.
 
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>

@@ -1,10 +1,16 @@
-# Usage
+# User Guide {: .doctitle}
+Using and configuring Easydiff.
+{: .doctitle-info}
+
+---
+
+# Basic Usage
 Easy diff is easy to use.  Simply select the `Set Left Side` option in the context menus to set what is to be compared on the left side when in a view.  Then select the what to compare to via `Compare with` menu option (select the right side view first if comparing to a view).
 
 For version control, just select the applicable option when in a view that is versioned controlled.
 
 # General Settings
-Easy diff, by default, shows diffs in a spearate view, you can display the diff in an output panel if desired using the following setting:
+Easy diff, by default, shows diffs in a separate view, you can display the diff in an output panel if desired using the following setting:
 
 ```javascript
     // If enabled, this allows for multiple selections.
@@ -102,7 +108,7 @@ Configure the external binary setting to point to diff tool binary, and then ena
     "external_diff": "",
 ```
 
-The external option assumes the diff the tool takes arguments as such: `tool file1 file2`.  If this is not the case, you will probably have to wrap the command in a shell script that takes the options as described, and call it directly instead.  For instance, using DeltaWalker on Mac, I copied their provided workflow configuration to a shell script, and call it directly:
+The external option assumes the diff the tool takes arguments as such: `tool file1 file2`.  If this is not the case, you will probably have to wrap the command in a shell script that takes the options as described, and call it directly instead.  For instance, using DeltaWalker on Mac, I copied their provided work flow configuration to a shell script, and call it directly:
 
 ```bash
 #!/bin/sh
