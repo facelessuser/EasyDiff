@@ -1,7 +1,7 @@
 """
-Easy Diff Version Control
+Easy Diff Version Control.
 
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import sublime
@@ -11,7 +11,8 @@ import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
 import EasyDiff.lib.hg as hg
 from EasyDiff.lib.multiconf import get as multiget
-from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding, get_external_diff, get_target, notify, get_group_view
+from EasyDiff.easy_diff_global import load_settings, log, debug, get_encoding
+from EasyDiff.easy_diff_global import get_external_diff, get_target, notify, get_group_view
 import subprocess
 import tempfile
 
@@ -24,17 +25,26 @@ HG_ENABLED = False
 # Version Control Base
 ###############################
 class _VersionControlDiff(object):
+
+    """Version control diff base class."""
+
     control_type = ""
     control_enabled = False
     temp_folder = None
 
     def get_diff(self, name, **kwargs):
+        """Get the diff."""
+
         return None
 
     def is_versioned(self, name):
+        """Check if file is versioned."""
+
         return False
 
     def vc_is_enabled(self, name):
+        """Check if version control command is enabled."""
+
         enabled = False
         if name is not None:
             try:
@@ -45,32 +55,44 @@ class _VersionControlDiff(object):
                         self.is_versioned(name)
                     )
                 )
-            except:
+            except Exception:
                 pass
         return enabled
 
     def decode(self, result):
+        """Decode with encoding."""
+
         try:
             debug("decoding with %s" % self.encoding)
             return result.decode(self.encoding)
-        except:
+        except Exception:
             debug("fallback to utf-8 decode")
             return result.decode('utf-8')
 
     def get_encoding(self):
+        """Get the encoding."""
+
         return get_encoding(self.view)
 
     def create_temp(self):
+        """Create temp folder."""
+
         if self.temp_folder is None:
             self.temp_folder = tempfile.mkdtemp(prefix="easydiff")
 
-    def get_files(name, **kwargs):
+    def get_files(self, name, **kwargs):
+        """Get files."""
+
         return None, None
 
     def revert_file(self, name):
+        """Revert the file."""
+
         pass
 
     def revert(self, name):
+        """Revert control."""
+
         result = self.get_diff(name)
 
         if result == "":
@@ -85,6 +107,8 @@ class _VersionControlDiff(object):
                 sublime.error_message("Could not revert \"%s\"!" % basename(name))
 
     def internal_diff(self, name, **kwargs):
+        """Diff with internal diff."""
+
         result = self.get_diff(name, **kwargs)
 
         if result == "":
@@ -108,6 +132,8 @@ class _VersionControlDiff(object):
                 win.run_command("show_panel", {"panel": "output.easy_diff"})
 
     def external_diff(self, name, **kwargs):
+        """Diff with external diff command."""
+
         self.create_temp()
         f1, f2 = self.get_files(name, **kwargs)
         ext_diff = get_external_diff()
@@ -121,16 +147,22 @@ class _VersionControlDiff(object):
             )
 
     def is_loaded(self):
+        """Check if view is loaded."""
+
         if self.view.is_loading():
             sublime.set_timeout(self.is_loaded, 100)
         else:
             self.diff()
 
     def vc_run(self, **kwargs):
+        """Run version control command."""
+
         self.kwargs = kwargs
         sublime.set_timeout(self.is_loaded, 100)
 
     def diff(self):
+        """Diff."""
+
         name = self.view.file_name() if self.view is not None else None
         self.encoding = self.get_encoding()
         if name is not None:
@@ -145,7 +177,12 @@ class _VersionControlDiff(object):
 
 
 class _VersionControlCommand(sublime_plugin.WindowCommand):
+
+    """Version control base command."""
+
     def run(self, paths=[], group=-1, index=-1, **kwargs):
+        """Run command."""
+
         if len(paths):
             name = get_target(paths)
         elif index != -1:
@@ -166,6 +203,8 @@ class _VersionControlCommand(sublime_plugin.WindowCommand):
         self.vc_run(**kwargs)
 
     def is_enabled(self, paths=[], group=-1, index=-1, **kwargs):
+        """Check if command is enabled."""
+
         if len(paths) or index != -1:
             name = get_target(paths, group, index)
         else:
@@ -184,14 +223,23 @@ class _VersionControlCommand(sublime_plugin.WindowCommand):
 # Version Control Specific Classes
 ###############################
 class _EasyDiffSvn(_VersionControlDiff):
+
+    """SVN command."""
+
     def setup(self):
+        """Setup important variables."""
+
         self.control_type = "SVN"
         self.control_enabled = SVN_ENABLED
 
     def revert_file(self, name):
+        """Revert file."""
+
         svn.revert(name)
 
     def get_files(self, name, **kwargs):
+        """Get files."""
+
         f1 = None
         f2 = None
         if self.is_versioned(name):
@@ -210,11 +258,15 @@ class _EasyDiffSvn(_VersionControlDiff):
         return f1, f2
 
     def is_versioned(self, name):
+        """Check if file is versioned."""
+
         disabled = multiget(load_settings(), "svn_disabled", False)
         on_disk = exists(name)
         return not disabled and on_disk and svn.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
+        """Get the diff."""
+
         result = None
         if self.is_versioned(name):
             result = self.decode(svn.diff(name, last=kwargs.get("last", False))).replace('\r', '')
@@ -224,14 +276,23 @@ class _EasyDiffSvn(_VersionControlDiff):
 
 
 class _EasyDiffGit(_VersionControlDiff):
+
+    """Git command."""
+
     def setup(self):
+        """Setup important variables."""
+
         self.control_type = "GIT"
         self.control_enabled = GIT_ENABLED
 
     def revert_file(self, name):
+        """Revert the file."""
+
         git.checkout(name)
 
     def get_files(self, name, **kwargs):
+        """Get files."""
+
         f1 = None
         f2 = None
         if self.is_versioned(name):
@@ -259,11 +320,15 @@ class _EasyDiffGit(_VersionControlDiff):
         return f1, f2
 
     def is_versioned(self, name):
+        """Check if file is versioned."""
+
         disabled = multiget(load_settings(), "git_disabled", False)
         on_disk = exists(name)
         return not disabled and on_disk and git.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
+        """Get the diff."""
+
         result = None
         if git.is_versioned(name):
             result = self.decode(
@@ -278,14 +343,23 @@ class _EasyDiffGit(_VersionControlDiff):
 
 
 class _EasyDiffHg(_VersionControlDiff):
+
+    """Mercurial command."""
+
     def setup(self):
+        """Setup important variables."""
+
         self.control_type = "HG"
         self.control_enabled = HG_ENABLED
 
     def revert_file(self, name):
+        """Revert file."""
+
         hg.revert(name)
 
     def get_files(self, name, **kwargs):
+        """Get the files."""
+
         f1 = None
         f2 = None
         if self.is_versioned(name):
@@ -313,11 +387,15 @@ class _EasyDiffHg(_VersionControlDiff):
         return f1, f2
 
     def is_versioned(self, name):
+        """Check if file is versioned."""
+
         disabled = multiget(load_settings(), "hg_disabled", False)
         on_disk = exists(name)
         return not disabled and on_disk and hg.is_versioned(name)
 
     def get_diff(self, name, **kwargs):
+        """Get the diff."""
+
         result = None
         if self.is_versioned(name):
             result = self.decode(hg.diff(name, last=kwargs.get("last", False))).replace('\r', '')
@@ -330,19 +408,34 @@ class _EasyDiffHg(_VersionControlDiff):
 # Version Control Commands
 ###############################
 class EasyDiffSvnCommand(_VersionControlCommand, _EasyDiffSvn):
+
+    """SVN diff command."""
+
     def __init__(self, window):
+        """Initialize."""
+
         super().__init__(window)
         self.setup()
 
 
 class EasyDiffGitCommand(_VersionControlCommand, _EasyDiffGit):
+
+    """Git diff command."""
+
     def __init__(self, window):
+        """Initialize."""
+
         super().__init__(window)
         self.setup()
 
 
 class EasyDiffHgCommand(_VersionControlCommand, _EasyDiffHg):
+
+    """Mercurial diff command."""
+
     def __init__(self, window):
+        """Initialize."""
+
         super().__init__(window)
         self.setup()
 
@@ -351,6 +444,8 @@ class EasyDiffHgCommand(_VersionControlCommand, _EasyDiffHg):
 # Loaders
 ###############################
 def setup_vc_binaries():
+    """Setup version control binaries."""
+
     global SVN_ENABLED
     global GIT_ENABLED
     global HG_ENABLED
@@ -369,25 +464,24 @@ def setup_vc_binaries():
     try:
         log("svn %s" % svn.version())
         SVN_ENABLED = True
-    except:
+    except Exception:
         log("svn not found or is not working!")
-        pass
     try:
         log("git %s" % git.version())
         GIT_ENABLED = True
-    except:
+    except Exception:
         log("git not found or is not working!")
-        pass
     try:
         log("hg %s" % hg.version())
         HG_ENABLED = True
-    except:
+    except Exception:
         log("hg not found or is not working!")
-        pass
 
     settings.clear_on_change('reload_vc')
     settings.add_on_change('reload_vc', setup_vc_binaries)
 
 
 def plugin_loaded():
+    """Setup plugin."""
+
     setup_vc_binaries()

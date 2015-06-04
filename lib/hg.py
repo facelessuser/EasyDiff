@@ -1,7 +1,7 @@
 """
-hg
+Hg.
 
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import xml.etree.ElementTree as ET
@@ -22,9 +22,7 @@ _hg_path = "hg.exe" if _PLATFORM == "windows" else "hg"
 
 
 def hgopen(args, cwd=None):
-    """
-    Call Git with arguments
-    """
+    """Call Git with arguments."""
 
     returncode = None
     output = None
@@ -66,9 +64,7 @@ def hgopen(args, cwd=None):
 
 
 def cat(target, rev=None):
-    """
-    Show file at revision
-    """
+    """Show file at revision."""
 
     assert exists(target), "%s does not exist!" % target
     args = ["cat", target]
@@ -78,18 +74,14 @@ def cat(target, rev=None):
 
 
 def revert(target):
-    """
-    Revert file
-    """
+    """Revert file."""
 
     assert exists(target), "%s does not exist!" % target
     hgopen(["revert", "--no-backup", target], dirname(target))
 
 
 def getrevision(target, count=1):
-    """
-    Get revision(s)
-    """
+    """Get revision(s)."""
 
     assert exists(target), "%s does not exist!" % target
     results = log(target, count)
@@ -101,9 +93,7 @@ def getrevision(target, count=1):
 
 
 def diff(target, last=False):
-    """
-    Diff current file against last revision
-    """
+    """Diff current file against last revision."""
 
     args = None
 
@@ -119,9 +109,7 @@ def diff(target, last=False):
 
 
 def log(target=None, limit=0):
-    """
-    Get hg log(s)
-    """
+    """Get hg log."""
 
     assert exists(target), "%s does not exist!" % target
 
@@ -142,9 +130,7 @@ def log(target=None, limit=0):
 
 
 def is_versioned(target):
-    """
-    Check if file/folder is versioned
-    """
+    """Check if file/folder is versioned."""
 
     assert exists(target), "%s does not exist!" % target
     versioned = False
@@ -153,16 +139,14 @@ def is_versioned(target):
         if results is not None:
             if results.find("logentry") is not None:
                 versioned = True
-    except:
+    except Exception:
         pass
 
     return versioned
 
 
 def version():
-    """
-    Get hg app version
-    """
+    """Get hg app version."""
 
     version = None
     output = hgopen(['--version'])
@@ -173,9 +157,7 @@ def version():
 
 
 def set_hg_path(pth):
-    """
-    Set hg path
-    """
+    """Set hg path."""
 
     global _hg_path
     _hg_path = pth

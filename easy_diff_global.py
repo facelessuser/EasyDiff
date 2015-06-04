@@ -1,7 +1,7 @@
 """
-Easy Diff Global
+Easy Diff Global.
 
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import sublime
@@ -10,10 +10,15 @@ from EasyDiff.lib.multiconf import get as multiget
 import re
 try:
     from SubNotify.sub_notify import SubNotifyIsReadyCommand as Notify
-except:
+except Exception:
     class Notify:
+
+        """Dummy fallback notify class."""
+
         @classmethod
         def is_ready(cls):
+            """Disable notifications."""
+
             return False
 
 DEBUG = False
@@ -27,12 +32,10 @@ if SHEET_WORKAROUND:
         # timestamps when refocusing our view when we try to resolve sheet index
         # with view index.
         from TabsExtra.tabs_extra import get_group_view
-    except:
+    except Exception:
         # TabsExtra is not available.  Do not worry about activation trackers.
         def get_group_view(window, group, index):
-            """
-            Get the view at the given index in the given group.
-            """
+            """Get the view at the given index in the given group."""
 
             if SHEET_WORKAROUND:
                 active_sheet = window.active_sheet()
@@ -51,9 +54,7 @@ if SHEET_WORKAROUND:
             return view
 else:
     def get_group_view(window, group, index):
-        """
-        Get the view at the given index in the given group.
-        """
+        """Get the view at the given index in the given group."""
 
         sheets = window.sheets_in_group(int(group))
         sheet = sheets[index] if index < len(sheets) else None
@@ -63,6 +64,8 @@ else:
 
 
 def log(msg, status=False):
+    """Log messages."""
+
     string = str(msg)
     print("EasyDiff: %s" % string)
     if status:
@@ -70,15 +73,21 @@ def log(msg, status=False):
 
 
 def debug(msg, status=False):
+    """Debug message."""
+
     if DEBUG:
         log(msg, status)
 
 
 def load_settings():
+    """Load settings."""
+
     return sublime.load_settings(SETTINGS)
 
 
 def global_reload():
+    """Global reload."""
+
     set_debug_flag()
     settings = load_settings()
     settings.clear_on_change('reload_global')
@@ -86,6 +95,8 @@ def global_reload():
 
 
 def set_debug_flag():
+    """Set debug flag."""
+
     global DEBUG
     settings = load_settings()
     DEBUG = settings.get("debug", False)
@@ -93,6 +104,8 @@ def set_debug_flag():
 
 
 def get_encoding(view):
+    """Get the file encoding."""
+
     encoding = view.encoding()
     mapping = [
         ("with BOM", ""),
@@ -112,14 +125,21 @@ def get_encoding(view):
 
 
 def get_external_diff():
+    """Get external diff path."""
+
     settings = load_settings()
     ext_diff = multiget(settings, "external_diff", None)
-    diff_path = None if ext_diff is None or ext_diff == "" or not exists(abspath(normpath(ext_diff))) else abspath(normpath(ext_diff))
+    if ext_diff is None or ext_diff == "" or not exists(abspath(normpath(ext_diff))):
+        diff_path = None
+    else:
+        diff_path = abspath(normpath(ext_diff))
     debug("External diff was not found!" if diff_path is None else "External diff \"%s\" found." % diff_path)
     return diff_path
 
 
 def get_target(paths=[], group=-1, index=-1):
+    """Get the target."""
+
     target = None
     if index != -1:
         view = get_group_view(sublime.active_window(), group, index)
@@ -133,6 +153,8 @@ def get_target(paths=[], group=-1, index=-1):
 
 
 def notify(msg):
+    """Notify with SubNotify if possible and enabled."""
+
     if load_settings().get("use_sub_notify", False) and Notify.is_ready():
         sublime.run_command("sub_notify", {"title": "EasyDiff", "msg": msg})
     else:
@@ -140,4 +162,6 @@ def notify(msg):
 
 
 def plugin_loaded():
+    """Setup plugin."""
+
     global_reload()

@@ -1,7 +1,7 @@
 """
-Easy Diff Dynamic Menu
+Easy Diff Dynamic Menu.
 
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import sublime
@@ -641,7 +641,12 @@ HG_TAB_EXTERNAL_MENU = '''
 # Menu Updater
 ###############################
 class MenuUpdater(object):
+
+    """Update menu."""
+
     def __init__(self, name):
+        """Initialize."""
+
         self.name = name
         self.menu_path = join(sublime.packages_path(), "User", MENU_FOLDER)
         if not exists(self.menu_path):
@@ -655,6 +660,8 @@ class MenuUpdater(object):
         self.show_int = multiget(settings, "show_internal", True)
 
     def update_menu(self, menu_name, menus, submenu):
+        """Update the menu."""
+
         if exists(self.menu_path):
             menu = join(self.menu_path, menu_name)
             vc_internal = []
@@ -685,18 +692,30 @@ class MenuUpdater(object):
                     (DIFF_SUBMENU if submenu else DIFF_MENU) % {
                         "internal": ("" if not self.show_int else menus["internal"] % {"file_name": self.name}),
                         "external": ("" if not self.show_ext else menus["external"] % {"file_name": self.name}),
-                        "vc_internal": ("" if vc_internal_menu is None or not self.show_int else VC_INTERNAL_MENU % {"vc": vc_internal_menu}),
-                        "vc_external": ("" if vc_external_menu is None or not self.show_ext else VC_EXTERNAL_MENU % {"vc": vc_external_menu})
+                        "vc_internal": (
+                            "" if vc_internal_menu is None or not self.show_int else VC_INTERNAL_MENU % {
+                                "vc": vc_internal_menu
+                            }
+                        ),
+                        "vc_external": (
+                            "" if vc_external_menu is None or not self.show_ext else VC_EXTERNAL_MENU % {
+                                "vc": vc_external_menu
+                            }
+                        )
                     }
                 )
 
     def remove_menu(self, menu_name):
+        """Remove the menu."""
+
         if exists(self.menu_path):
             menu = join(self.menu_path, menu_name)
             if exists(menu):
                 remove(menu)
 
     def update_context_menu(self):
+        """Update the context menu."""
+
         menus = {
             "internal": INTERNAL_MENU,
             "external": EXTERNAL_MENU,
@@ -720,6 +739,8 @@ class MenuUpdater(object):
             self.remove_menu(CONTEXT_MENU)
 
     def update_sidebar_menu(self):
+        """Update the sidebar menu."""
+
         menus = {
             "internal": INTERNAL_SIDEBAR_MENU,
             "external": EXTERNAL_SIDEBAR_MENU,
@@ -743,6 +764,8 @@ class MenuUpdater(object):
             self.remove_menu(SIDEBAR_MENU)
 
     def update_tab_menu(self):
+        """Update tab menu."""
+
         menus = {
             "internal": INTERNAL_TAB_MENU,
             "external": EXTERNAL_TAB_MENU,
@@ -767,6 +790,8 @@ class MenuUpdater(object):
 
 
 def update_menu(name="..."):
+    """Update all menus."""
+
     menu_updater = MenuUpdater(name)
     menu_updater.update_context_menu()
     menu_updater.update_sidebar_menu()
@@ -777,6 +802,8 @@ def update_menu(name="..."):
 # Loaders
 ###############################
 def refresh_menu():
+    """Refresh teh menus."""
+
     update_menu()
     debug("refresh menu")
     settings = load_settings()
@@ -785,4 +812,6 @@ def refresh_menu():
 
 
 def plugin_loaded():
+    """Setup plugin."""
+
     refresh_menu()

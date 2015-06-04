@@ -1,7 +1,7 @@
 """
-svn
+SVN.
 
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import xml.etree.ElementTree as ET
@@ -27,9 +27,7 @@ _svn_path = "svn.exe" if _PLATFORM == "windows" else "svn"
 
 
 def svnopen(args):
-    """
-    Call SVN with arguments
-    """
+    """Call SVN with arguments."""
 
     returncode = None
     output = None
@@ -68,20 +66,19 @@ def svnopen(args):
 
 
 def revert(target):
-    """
-    Revert file
-    """
+    """Revert file."""
 
     assert exists(target), "%s does not exist!" % target
     svnopen(["revert", target])
 
 
 def info(target):
-    """
-    Get general SVN info
-    """
+    """Get general SVN info."""
 
-    assert (target.startswith("http://") or target.startswith("https://")) or exists(target), "%s does not exist!" % target
+    assert (
+        (target.startswith("http://") or target.startswith("https://")) or
+        exists(target)
+    ), "%s does not exist!" % target
     output = svnopen(['info', "--xml", target])
     return ET.fromstring(output)
 
@@ -89,6 +86,7 @@ def info(target):
 def searchinfo(xml, *args):
     """
     Search the info (acquired via the info method) for the keys given.
+
     Return the related info for each key in a dictionary.
     """
 
@@ -114,15 +112,13 @@ def searchinfo(xml, *args):
             elif a in ["token", "owner", "created", "expires"]:
                 lk = entry.find("lock")
                 keys[a] = lk.find(a).text
-        except:
+        except Exception:
             keys[a] = None
     return keys
 
 
 def geturl(pth):
-    """
-    Get SVN url from file
-    """
+    """Get SVN url from file."""
 
     output = info(pth)
     search_targets = ["url"]
@@ -131,9 +127,7 @@ def geturl(pth):
 
 
 def getrevision(pth):
-    """
-    Get SVN revision
-    """
+    """Get SVN revision."""
 
     output = info(pth)
     search_targets = ["revision"]
@@ -142,9 +136,7 @@ def getrevision(pth):
 
 
 def diff(target, last=False):
-    """
-    Get SVN diff of last version
-    """
+    """Get SVN diff of last version."""
 
     assert exists(target), "%s does not exist!" % target
     assert isfile(target), "%s is not a file!" % target
@@ -152,18 +144,14 @@ def diff(target, last=False):
 
 
 def commit(pth, msg=""):
-    """
-    Commit changes
-    """
+    """Commit changes."""
 
     assert exists(pth), "%s does not exist!" % pth
     svnopen(["commit", pth, "-m", msg])
 
 
 def checklock(pth):
-    """
-    Check if file is locked
-    """
+    """Check if file is locked."""
 
     lock_msg = ""
     lock_type = NO_LOCK
@@ -198,18 +186,14 @@ def checklock(pth):
 
 
 def lock(pth):
-    """
-    Lock file
-    """
+    """Lock file."""
 
     assert exists(pth), "%s does not exist!" % pth
     svnopen(['lock', pth])
 
 
 def breaklock(pth, force=False):
-    """
-    Breack file lock
-    """
+    """Breack file lock."""
 
     assert exists(pth), "%s does not exist!" % pth
 
@@ -223,27 +207,21 @@ def breaklock(pth, force=False):
 
 
 def checkout(url, pth):
-    """
-    Checkout SVN url
-    """
+    """Checkout SVN url."""
 
     svnopen(['checkout', url, pth])
     assert exists(pth)
 
 
 def update(pth):
-    """
-    Update SVN directory
-    """
+    """Update SVN directory."""
 
     assert exists(pth), "%s does not exist!" % pth
     svnopen(['update', pth])
 
 
 def export(url, name, rev=None):
-    """
-    Export file
-    """
+    """Export file."""
 
     args = ["export"]
     if rev is not None:
@@ -255,27 +233,21 @@ def export(url, name, rev=None):
 
 
 def add(pth):
-    """
-    Add a file
-    """
+    """Add a file."""
 
     assert exists(pth), "%s does not exist!" % pth
     svnopen(['add', pth])
 
 
 def cleanup(pth):
-    """
-    Clean up a folder
-    """
+    """Clean up a folder."""
 
     assert exists(pth), "%s does not exist!" % pth
     svnopen(['cleanup', pth])
 
 
 def status(pth, ignore_externals=False, ignore_unversioned=False, depth="infinity"):
-    """
-    Get the SVN status for the folder
-    """
+    """Get the SVN status for the folder."""
 
     assert exists(pth), "%s does not exist!" % pth
 
@@ -317,16 +289,17 @@ def status(pth, ignore_externals=False, ignore_unversioned=False, depth="infinit
                 continue
             if item in attributes:
                 attributes[item].append(entry.attrib["path"])
-    elif not ignore_unversioned and re.search(r"svn: warning: .* is not a working copy", target.text.lstrip()) is not None:
+    elif (
+        not ignore_unversioned and
+        re.search(r"svn: warning: .* is not a working copy", target.text.lstrip()) is not None
+    ):
         attributes["unversioned"].append(target.attrib["path"])
 
     return attributes
 
 
 def is_versioned(target):
-    """
-    Check if file/folder is versioned
-    """
+    """Check if file/folder is versioned."""
 
     assert exists(target), "%s does not exist!" % target
 
@@ -335,16 +308,14 @@ def is_versioned(target):
         entries = status(target, depth="empty")
         if len(entries["unversioned"]) == 0:
             versioned = True
-    except:
+    except Exception:
         pass
 
     return versioned
 
 
 def version():
-    """
-    Get SVN app version
-    """
+    """Get SVN app version."""
 
     version = None
     output = svnopen(['--version'])
@@ -355,9 +326,7 @@ def version():
 
 
 def set_svn_path(pth):
-    """
-    Set SVN path
-    """
+    """Set SVN path."""
 
     global _svn_path
     _svn_path = pth

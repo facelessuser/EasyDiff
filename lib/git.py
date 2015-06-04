@@ -1,7 +1,7 @@
 """
-git
+Git.
 
-Copyright (c) 2013 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 # import xml.etree.ElementTree as ET
@@ -26,9 +26,7 @@ _git_path = "git.exe" if _PLATFORM == "windows" else "git"
 
 
 def is_system_root(target):
-    """
-    Check if target is the root folder
-    """
+    """Check if target is the root folder."""
 
     root = False
     windows = _PLATFORM == "windows"
@@ -41,9 +39,7 @@ def is_system_root(target):
 
 
 def get_git_tree(target):
-    """
-    Recursively get Git tree
-    """
+    """Recursively get Git tree."""
 
     root = is_system_root(target)
     is_file = isfile(target)
@@ -58,17 +54,13 @@ def get_git_tree(target):
 
 
 def get_git_dir(tree):
-    """
-    Get Git directory from tree
-    """
+    """Get Git directory from tree."""
 
     return join(tree, ".git")
 
 
 def gitopen(args, git_tree=None):
-    """
-    Call Git with arguments
-    """
+    """Call Git with arguments."""
 
     returncode = None
     output = None
@@ -111,9 +103,7 @@ def gitopen(args, git_tree=None):
 
 
 def show(target, rev):
-    """
-    Show file at revision
-    """
+    """Show file at revision."""
 
     assert exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
@@ -128,9 +118,7 @@ def show(target, rev):
 
 
 def getrevision(target, count=1):
-    """
-    Get revision(s)
-    """
+    """Get revision(s)."""
 
     assert exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
@@ -145,9 +133,7 @@ def getrevision(target, count=1):
 
 
 def checkout(target, rev=None):
-    """
-    Checkout file
-    """
+    """Checkout file."""
 
     assert exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
@@ -162,9 +148,7 @@ def checkout(target, rev=None):
 
 
 def diff(target, last=False):
-    """
-    Diff current file against last revision
-    """
+    """Diff current file against last revision."""
 
     assert exists(target), "%s does not exist!" % target
     # assert diff_type in [ALL_DIFF, STAGED_DIFF, UNSTAGED_DIFF], "diff_type is bad!"
@@ -194,9 +178,7 @@ def diff(target, last=False):
 
 
 def is_versioned(target):
-    """
-    Check if file/folder is versioned
-    """
+    """Check if file/folder is versioned."""
 
     assert exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
@@ -211,9 +193,7 @@ def is_versioned(target):
 
 
 def version():
-    """
-    Get Git app version
-    """
+    """Get Git app version."""
 
     version = None
     output = gitopen(['--version'])
@@ -224,9 +204,7 @@ def version():
 
 
 def set_git_path(pth):
-    """
-    Set Git path
-    """
+    """Set Git path."""
 
     global _git_path
     _git_path = pth

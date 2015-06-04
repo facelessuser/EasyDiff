@@ -1,15 +1,14 @@
 # User Guide {: .doctitle}
 Using and configuring Easydiff.
-{: .doctitle-info}
 
 ---
 
-# Basic Usage
+## Basic Usage
 Easy diff is easy to use.  Simply select the `Set Left Side` option in the context menus to set what is to be compared on the left side when in a view.  Then select the what to compare to via `Compare with` menu option (select the right side view first if comparing to a view).
 
 For version control, just select the applicable option when in a view that is versioned controlled.
 
-# General Settings
+## General Settings
 Easy diff, by default, shows diffs in a separate view, you can display the diff in an output panel if desired using the following setting:
 
 ```javascript
@@ -31,10 +30,10 @@ Easy allows for diffing with the clipboard selections, and multi-selections.  Th
     "use_selections": false,
 ```
 
-# Dynamic Menu
+## Dynamic Menu
 Easy diff creates a dynamic menu in `User/EasyDiff/Context.sublime-menu`, `User/EasyDiff/Tab Context.sublime-menu`, and `User/EasyDiff/Side Bar.sublime-menu`.  The content of this context menu changes depending on what is enabled or disabled, hidden or shown, and depending on whether a view, selection, or clipboard has been selected for left side compare.  If a view that was previously set has been closed, that view will no longer be reported in the context menu.  You can look here to see how the commands are constructed if you would like to bind the options to shortcuts or to the command palette.
 
-## Excluding Dynamic Menu from Certain UI Elements
+### Excluding Dynamic Menu from Certain UI Elements
 Easy diff shows access commands in the view, tab, and sidebar context menu.  If it is desired to exclude access in one of these UI elements, you can remove the element from the following setting:
 
 ```javascript
@@ -42,7 +41,7 @@ Easy diff shows access commands in the view, tab, and sidebar context menu.  If 
     "menu_types": ["view", "tab", "sidebar"],
 ```
 
-# Version Control Setup
+## Version Control Setup
 EasyDiff currently supports SVN, Git, and Mercurial.  These options should only appear in the context menus if EasyDiff can find the binaries `svn`, `git`, and `hg` respectively.
 
 If one of these options shows up, and you wish to disable them, you can go to your settings file and disable them completely with the following settings:
@@ -95,7 +94,7 @@ Currently, by default, EasyDiff will check if the current view is versioned cont
     "skip_version_check_on_is_enabled": false,
 ```
 
-# Diffing with External Diff Tools
+## Diffing with External Diff Tools
 Easy diff, by default, has options to diff everything internally in a single view.  But, it can be configured to diff in external tools instead.
 
 Configure the external binary setting to point to diff tool binary, and then enable external diff options:
@@ -118,7 +117,7 @@ java -Ddw.path=$DW_PATH -jar $DW_PATH/dw.jar "$1" "$2" "$3" "$4" "$5" "$6"
 
 ```
 
-# Hiding External or Internal Diffing from Context Menu
+## Hiding External or Internal Diffing from Context Menu
 EasyDiff allows you to hide either internal diffing options, external diffing options, or both.  The later options is useful if you do not use the context menu, but have bound the commands to keyboard shortcuts or to the command palette.
 
 The settings are:
