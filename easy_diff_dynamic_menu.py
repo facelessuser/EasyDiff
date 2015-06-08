@@ -1,5 +1,5 @@
 """
-Easy Diff Dynamic Menu.
+EasyDiff Dynamic Menu.
 
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
