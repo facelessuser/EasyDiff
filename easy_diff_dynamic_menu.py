@@ -641,7 +641,6 @@ HG_TAB_EXTERNAL_MENU = '''
 # Menu Updater
 ###############################
 class MenuUpdater(object):
-
     """Update menu."""
 
     def __init__(self, name):

@@ -25,7 +25,6 @@ HG_ENABLED = False
 # Version Control Base
 ###############################
 class _VersionControlDiff(object):
-
     """Version control diff base class."""
 
     control_type = ""
@@ -177,7 +176,6 @@ class _VersionControlDiff(object):
 
 
 class _VersionControlCommand(sublime_plugin.WindowCommand):
-
     """Version control base command."""
 
     def run(self, paths=[], group=-1, index=-1, **kwargs):
@@ -223,7 +221,6 @@ class _VersionControlCommand(sublime_plugin.WindowCommand):
 # Version Control Specific Classes
 ###############################
 class _EasyDiffSvn(_VersionControlDiff):
-
     """SVN command."""
 
     def setup(self):
@@ -276,7 +273,6 @@ class _EasyDiffSvn(_VersionControlDiff):
 
 
 class _EasyDiffGit(_VersionControlDiff):
-
     """Git command."""
 
     def setup(self):
@@ -343,7 +339,6 @@ class _EasyDiffGit(_VersionControlDiff):
 
 
 class _EasyDiffHg(_VersionControlDiff):
-
     """Mercurial command."""
 
     def setup(self):
@@ -408,7 +403,6 @@ class _EasyDiffHg(_VersionControlDiff):
 # Version Control Commands
 ###############################
 class EasyDiffSvnCommand(_VersionControlCommand, _EasyDiffSvn):
-
     """SVN diff command."""
 
     def __init__(self, window):
@@ -419,7 +413,6 @@ class EasyDiffSvnCommand(_VersionControlCommand, _EasyDiffSvn):
 
 
 class EasyDiffGitCommand(_VersionControlCommand, _EasyDiffGit):
-
     """Git diff command."""
 
     def __init__(self, window):
@@ -430,7 +423,6 @@ class EasyDiffGitCommand(_VersionControlCommand, _EasyDiffGit):
 
 
 class EasyDiffHgCommand(_VersionControlCommand, _EasyDiffHg):
-
     """Mercurial diff command."""
 
     def __init__(self, window):

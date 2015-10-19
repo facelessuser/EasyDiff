@@ -18,7 +18,6 @@ RIGHT = 2
 
 
 class EasyDiffView(object):
-
     """Simulate the look of a view."""
 
     def __init__(self, name, content, encoding):
@@ -56,7 +55,6 @@ class EasyDiffView(object):
 
 
 class EasyDiffInput(object):
-
     """Class for diff input."""
 
     def __init__(self, v1, v2, external=False):
@@ -143,7 +141,6 @@ class EasyDiffInput(object):
 
 
 class EasyDiff(object):
-
     """Basic diff object."""
 
     @classmethod

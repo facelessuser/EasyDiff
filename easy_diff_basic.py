@@ -69,7 +69,6 @@ def diff(right, external=False):
 # Helper Classes
 ###############################
 class _EasyDiffSelection(object):
-
     """Handle selection diff."""
 
     def get_selections(self):
@@ -106,7 +105,6 @@ class _EasyDiffSelection(object):
 
 
 class _EasyDiffCompareBothTextCommand(sublime_plugin.TextCommand):
-
     """Compare text command."""
 
     def run(self, edit, external=False, group=-1, index=-1):
@@ -152,7 +150,6 @@ class _EasyDiffCompareBothTextCommand(sublime_plugin.TextCommand):
 
 
 class _EasyDiffCompareBothWindowCommand(sublime_plugin.WindowCommand):
-
     """Compare window command."""
 
     no_view = False
@@ -216,7 +213,6 @@ class _EasyDiffCompareBothWindowCommand(sublime_plugin.WindowCommand):
 # Set View
 ###############################
 class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand):
-
     """Set left side command."""
 
     def run(self, paths=[], group=-1, index=-1):
@@ -253,7 +249,6 @@ class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand):
 
 
 class EasyDiffCompareBothViewCommand(_EasyDiffCompareBothWindowCommand):
-
     """Compare view command."""
 
     def get_right(self):
@@ -280,7 +275,6 @@ class EasyDiffCompareBothViewCommand(_EasyDiffCompareBothWindowCommand):
 # Set Clipboard
 ###############################
 class EasyDiffSetLeftClipboardCommand(sublime_plugin.WindowCommand):
-
     """Set left side clipboard command."""
 
     def run(self, paths=[], group=-1, index=-1):
@@ -306,7 +300,6 @@ class EasyDiffSetLeftClipboardCommand(sublime_plugin.WindowCommand):
 
 
 class EasyDiffCompareBothClipboardCommand(_EasyDiffCompareBothWindowCommand):
-
     """Compare clipboard."""
 
     no_view = True
@@ -335,7 +328,6 @@ class EasyDiffCompareBothClipboardCommand(_EasyDiffCompareBothWindowCommand):
 # Set Selection
 ###############################
 class EasyDiffSetLeftSelectionCommand(sublime_plugin.TextCommand, _EasyDiffSelection):
-
     """Set left side selection command."""
 
     def run(self, edit, group=-1, index=-1):
@@ -381,7 +373,6 @@ class EasyDiffSetLeftSelectionCommand(sublime_plugin.TextCommand, _EasyDiffSelec
 
 
 class EasyDiffCompareBothSelectionCommand(_EasyDiffCompareBothTextCommand, _EasyDiffSelection):
-
     """Compare selection command."""
 
     def get_right(self):
@@ -407,7 +398,6 @@ class EasyDiffCompareBothSelectionCommand(_EasyDiffCompareBothTextCommand, _Easy
 # MRU Tab Command
 ###############################
 class EasyDiffMruPanelCompareCommand(sublime_plugin.WindowCommand):
-
     """Most recently used panel compare command."""
 
     def run(self, method="view", external=False):
@@ -624,7 +614,6 @@ PANEL_ENTRIES = [
 
 
 class EasyDiffPanelCommand(sublime_plugin.TextCommand):
-
     """Diff panel command."""
 
     def run(self, edit, external=False):
@@ -693,7 +682,6 @@ class EasyDiffPanelCommand(sublime_plugin.TextCommand):
 
 
 class EasyDiffPanelSetLeftCommand(sublime_plugin.TextCommand):
-
     """Panel set left command."""
 
     def run(self, edit, external):
@@ -733,7 +721,6 @@ class EasyDiffPanelSetLeftCommand(sublime_plugin.TextCommand):
 
 
 class EasyDiffPanelCompareCommand(sublime_plugin.TextCommand):
-
     """Manage panel compare commands."""
 
     def run(self, edit, external):
@@ -777,7 +764,6 @@ class EasyDiffPanelCompareCommand(sublime_plugin.TextCommand):
 # View Close Listener
 ###############################
 class EasyDiffListener(sublime_plugin.EventListener):
-
     """Listener for EasyDiff."""
 
     current = None
