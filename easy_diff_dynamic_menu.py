@@ -68,22 +68,19 @@ VC_EXTERNAL_MENU = '''{
 ###############################
 INTERNAL_MENU = '''{ "caption": "-" },
     {
-        "caption": "EasyDiff Set Left Side",
         "command": "easy_diff_set_left"
     },
     {
-        "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
         "command": "easy_diff_compare_both"
     },
 '''
 
 EXTERNAL_MENU = '''{ "caption": "-" },
     {
-        "caption": "Diff Set Left Side",
-        "command": "easy_diff_set_left"
+        "command": "easy_diff_set_left",
+        "args": {"external": true}
     },
     {
-        "caption": "Diff Compare with \\"%(file_name)s\\"",
         "command": "easy_diff_compare_both",
         "args": {"external": true}
     },
@@ -200,25 +197,21 @@ HG_EXTERNAL_MENU = '''
 ###############################
 INTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
     {
-        "caption": "EasyDiff Set Left Side",
         "command": "easy_diff_set_left",
-        "args": {"no_selections": true, "paths": []}
+        "args": {"paths": []}
     },
     {
-        "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
         "command": "easy_diff_compare_both",
-        "args": {"no_selections": true, "paths": []}
+        "args": {"paths": []}
     },
 '''
 
 EXTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
     {
-        "caption": "Diff Set Left Side",
         "command": "easy_diff_set_left",
-        "args": {"paths": []}
+        "args": {"external": true, "paths": []}
     },
     {
-        "caption": "Diff Compare with \\"%(file_name)s\\"",
         "command": "easy_diff_compare_both",
         "args": {"external": true, "paths": []}
     },
@@ -338,12 +331,10 @@ HG_SIDEBAR_EXTERNAL_MENU = '''
 ###############################
 INTERNAL_TAB_MENU = '''{ "caption": "-" },
     {
-        "caption": "EasyDiff Set Left Side",
         "command": "easy_diff_set_left",
         "args": {"group": -1, "index": -1}
     },
     {
-        "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
         "command": "easy_diff_compare_both",
         "args": {"group": -1, "index": -1}
     },
@@ -351,12 +342,10 @@ INTERNAL_TAB_MENU = '''{ "caption": "-" },
 
 EXTERNAL_TAB_MENU = '''{ "caption": "-" },
     {
-        "caption": "Diff Set Left Side",
         "command": "easy_diff_set_left",
-        "args": {"group": -1, "index": -1}
+        "args": {"external": true, "group": -1, "index": -1}
     },
     {
-        "caption": "Diff Compare with \\"%(file_name)s\\"",
         "command": "easy_diff_compare_both",
         "args": {"external": true, "group": -1, "index": -1}
     },
@@ -523,8 +512,8 @@ class MenuUpdater(object):
             with open(menu, "w") as f:
                 f.write(
                     (DIFF_SUBMENU if submenu else DIFF_MENU) % {
-                        "internal": ("" if not self.show_int else menus["internal"] % {"file_name": self.name}),
-                        "external": ("" if not self.show_ext else menus["external"] % {"file_name": self.name}),
+                        "internal": ("" if not self.show_int else menus["internal"]),
+                        "external": ("" if not self.show_ext else menus["external"]),
                         "vc_internal": (
                             "" if vc_internal_menu is None or not self.show_int else VC_INTERNAL_MENU % {
                                 "vc": vc_internal_menu

@@ -215,13 +215,14 @@ class _EasyDiffCompareBothWindowCommand(sublime_plugin.WindowCommand):
 class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
     """Set left side command."""
 
-    def run(self, no_selections=False, paths=[], group=-1, index=-1):
+    def run(self, external=False, paths=[], group=-1, index=-1):
         """Run command."""
 
         global LEFT
+        self.external = external
         self.set_view(paths, group, index)
         if self.view is not None:
-            if bool(load_settings().get("use_selections", True)) and not no_selections and self.has_selections():
+            if bool(load_settings().get("use_selections", True)) and self.has_selections():
                 LEFT = {
                     "win_id": None, "view_id": None,
                     "clip": EasyDiffView("**selection**", self.get_selections(), self.get_encoding())
@@ -237,31 +238,43 @@ class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
     def set_view(self, paths, group=-1, index=-1, open_file=True):
         """Set view."""
 
+        self.view = None
         if len(paths):
             file_path = get_target(paths)
             if file_path is None:
                 return
             if open_file:
                 self.view = self.window.open_file(file_path)
+            else:
+                self.view = self.window.find_open_file(file_path)
         elif index != -1:
             self.view = get_group_view(self.window, group, index)
         else:
             self.view = self.window.active_view()
 
-    def is_enabled(self, no_selections=False, paths=[], group=-1, index=-1):
+    def is_enabled(self, external=False, paths=[], group=-1, index=-1):
         """Check if command is enabled."""
 
         return get_target(paths, group, index) is not None if len(paths) or index != -1 else True
+
+    def description(self, external=False, paths=[], group=-1, index=-1, open_file=True):
+        """Return menu description."""
+
+        self.set_view(paths, group, index, False)
+        if self.view is not None and self.has_selections():
+            description = "%sDiff Set Left Side (Selections)" % ('' if external else 'Easy')
+        else:
+            description = "%sDiff Set Left Side" % ('' if external else 'Easy')
+        return description
 
 
 class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
     """Compare window command."""
 
-    def run(self, no_selections=False, external=False, paths=[], group=-1, index=-1):
+    def run(self, external=False, paths=[], group=-1, index=-1):
         """run command."""
 
         self.external = external
-        self.no_selections = no_selections
         self.set_view(paths, group, index)
         if self.view is not None:
             self.diff()
@@ -273,7 +286,7 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
 
     def get_right(self):
         """Get right."""
-        if not self.no_selections and self.has_selections():
+        if self.has_selections():
             right = {
                 "win_id": None, "view_id": None,
                 "clip": EasyDiffView("**selection**", self.get_selections(), self.get_encoding())
@@ -285,12 +298,15 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
     def set_view(self, paths, group=-1, index=-1, open_file=True):
         """Set view."""
 
+        self.view = None
         if len(paths):
             file_path = get_target(paths)
             if file_path is None:
                 return
             if open_file:
                 self.view = self.window.open_file(file_path)
+            else:
+                self.view = self.window.find_open_file(file_path)
         elif index != -1:
             self.view = get_group_view(self.window, group, index)
         else:
@@ -303,6 +319,51 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
             LEFT is not None and
             (get_target(paths, group, index) is not None if len(paths) or index != -1 else True)
         )
+
+    def get_left_name(self):
+        """Get left name."""
+
+        name = '...'
+        if LEFT is not None:
+            left = LEFT.get("clip")
+            name = None
+            if left is not None:
+                name = left.file_name()
+            else:
+                win_id = LEFT.get("win_id")
+                view_id = LEFT.get("view_id")
+                window = None
+                view = None
+                for w in sublime.windows():
+                    if w.id() == win_id:
+                        window = w
+                if window is not None:
+                    for v in window.views():
+                        if v.id() == view_id:
+                            view = v
+                if view is not None:
+                    name = view.file_name()
+                    if name is None:
+                        name = "Untitled"
+                    else:
+                        name = basename(name)
+        return name
+
+    def description(self, external=False, paths=[], group=-1, index=-1, open_file=True):
+        """Return menu description."""
+
+        self.set_view(paths, group, index, False)
+        if self.view is not None and self.has_selections():
+            description = "%sDiff Compare Selections with \"%s\"" % (
+                '' if external else 'Easy',
+                self.get_left_name()
+            )
+        else:
+            description = "%sDiff Compare with \"%s\"" % (
+                '' if external else 'Easy',
+                self.get_left_name()
+            )
+        return description
 
 
 ###############################
