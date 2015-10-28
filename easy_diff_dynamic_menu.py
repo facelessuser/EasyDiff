@@ -69,81 +69,23 @@ VC_EXTERNAL_MENU = '''{
 INTERNAL_MENU = '''{ "caption": "-" },
     {
         "caption": "EasyDiff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left"
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard"
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_set_left_selection"
-            }
-        ]
+        "command": "easy_diff_set_left"
     },
     {
         "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view"
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard"
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_compare_both_selection"
-            }
-        ]
+        "command": "easy_diff_compare_both"
     },
 '''
 
 EXTERNAL_MENU = '''{ "caption": "-" },
     {
         "caption": "Diff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left"
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard"
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_set_left_selection"
-            }
-        ]
+        "command": "easy_diff_set_left"
     },
     {
         "caption": "Diff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"external": true}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"external": true}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_compare_both_selection",
-                "args": {"external": true}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"external": true}
     },
 '''
 
@@ -259,70 +201,26 @@ HG_EXTERNAL_MENU = '''
 INTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
     {
         "caption": "EasyDiff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left",
-                "args": {"paths": []}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard",
-                "args": {"paths": []}
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"no_selections": true, "paths": []}
     },
     {
         "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"paths": []}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"paths": []}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"no_selections": true, "paths": []}
     },
 '''
 
 EXTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
     {
         "caption": "Diff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left",
-                "args": {"paths": []}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard",
-                "args": {"paths": []}
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"paths": []}
     },
     {
         "caption": "Diff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"external": true, "paths": []}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"external": true, "paths": []}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"external": true, "paths": []}
     },
 '''
 
@@ -441,90 +339,26 @@ HG_SIDEBAR_EXTERNAL_MENU = '''
 INTERNAL_TAB_MENU = '''{ "caption": "-" },
     {
         "caption": "EasyDiff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_set_left_selection",
-                "args": {"group": -1, "index": -1}
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"group": -1, "index": -1}
     },
     {
         "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_compare_both_selection",
-                "args": {"group": -1, "index": -1}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"group": -1, "index": -1}
     },
 '''
 
 EXTERNAL_TAB_MENU = '''{ "caption": "-" },
     {
         "caption": "Diff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_set_left_selection",
-                "args": {"group": -1, "index": -1}
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"group": -1, "index": -1}
     },
     {
         "caption": "Diff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"external": true, "group": -1, "index": -1}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"external": true, "group": -1, "index": -1}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_compare_both_selection",
-                "args": {"external": true, "group": -1, "index": -1}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"external": true, "group": -1, "index": -1}
     },
 '''
 
