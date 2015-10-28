@@ -17,7 +17,7 @@ LEFT = None
 ###############################
 # Helper Functions
 ###############################
-def diff(right, external=False):
+def diff(left, right, external=False):
     """
     Initiate diff by getting left side and right side compare.
 
@@ -30,7 +30,7 @@ def diff(right, external=False):
     rv = None
 
     for w in sublime.windows():
-        if w.id() == LEFT["win_id"]:
+        if w.id() == left["win_id"]:
             lw = w
         if w.id() == right["win_id"]:
             rw = w
@@ -39,12 +39,12 @@ def diff(right, external=False):
 
     if lw is not None:
         for v in lw.views():
-            if v.id() == LEFT["view_id"]:
+            if v.id() == left["view_id"]:
                 lv = v
                 break
     else:
-        if LEFT["clip"]:
-            lv = LEFT["clip"]
+        if left["clip"]:
+            lv = left["clip"]
 
     if rw is not None:
         for v in rw.views():
@@ -102,111 +102,6 @@ class _EasyDiffSelection(object):
         else:
             selections = len(self.view.sel()) == 1 and self.view.sel()[0].size() > 0
         return selections
-
-
-class _EasyDiffCompareBothTextCommand(sublime_plugin.TextCommand):
-    """Compare text command."""
-
-    def run(self, edit, external=False, group=-1, index=-1):
-        """Run command."""
-
-        if index != -1:
-            # Ensure we have the correct view
-            self.view = get_group_view(sublime.active_window(), group, index)
-        diff(self.get_right(), external=external)
-
-    def view_has_selections(self, group=-1, index=-1):
-        """Check if view has selections."""
-
-        has_selections = False
-        if index != -1:
-            view = get_group_view(sublime.active_window(), group, index)
-            if view is not None:
-                if bool(load_settings().get("multi_select", False)):
-                    for sel in view.sel():
-                        if sel.size() > 0:
-                            has_selections = True
-                            break
-                else:
-                    has_selections = len(view.sel()) == 1 and view.sel()[0].size() > 0
-        else:
-            has_selections = self.has_selections()
-        return has_selections
-
-    def get_right(self):
-        """Get right."""
-
-        return None
-
-    def check_enabled(self, group=-1, index=-1):
-        """Check if command is enabled logic."""
-
-        return True
-
-    def is_enabled(self, external=False, group=-1, index=-1):
-        """Check if command is enabled."""
-
-        return LEFT is not None and self.check_enabled(group, index)
-
-
-class _EasyDiffCompareBothWindowCommand(sublime_plugin.WindowCommand):
-    """Compare window command."""
-
-    no_view = False
-
-    def run(self, external=False, paths=[], group=-1, index=-1):
-        """run command."""
-
-        self.external = external
-        self.set_view(paths, group, index)
-        if not self.no_view and self.view is None:
-            return
-        if not self.no_view:
-            sublime.set_timeout(self.is_loaded, 100)
-        else:
-            self.diff()
-
-    def is_loaded(self):
-        """Check if view is loaded."""
-
-        if self.view.is_loading():
-            sublime.set_timeout(self.is_loaded, 100)
-        else:
-            self.diff()
-
-    def diff(self):
-        """Diff."""
-
-        diff(self.get_right(), external=self.external)
-
-    def set_view(self, paths, group=-1, index=-1, open_file=True):
-        """Set view."""
-
-        if len(paths):
-            file_path = get_target(paths)
-            if file_path is None:
-                return
-            if open_file:
-                self.view = self.window.open_file(file_path)
-        elif index != -1:
-            self.view = get_group_view(self.window, group, index)
-        else:
-            self.view = self.window.active_view()
-
-    def get_right(self):
-        """Get right."""
-
-        return None
-
-    def check_enabled(self, paths=[], group=-1, index=-1):
-        """Check if command is enabled logic."""
-
-        return True
-
-    def is_enabled(self, external=False, paths=[], group=-1, index=-1):
-        """Check if command is enabled."""
-
-        return LEFT is not None and self.check_enabled(paths)
 
 
 ###############################
@@ -271,10 +166,11 @@ class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
 class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
     """Compare window command."""
 
-    def run(self, external=False, paths=[], group=-1, index=-1):
+    def run(self, external=False, clipboard=False, paths=[], group=-1, index=-1):
         """run command."""
 
         self.external = external
+        self.clipboard = clipboard
         self.set_view(paths, group, index)
         if self.view is not None:
             self.diff()
@@ -282,7 +178,19 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
     def diff(self):
         """Diff."""
 
-        diff(self.get_right(), external=self.external)
+        diff(self.get_left(), self.get_right(), external=self.external)
+
+    def get_left(self):
+        """Get left."""
+
+        if self.clipboard:
+            left = {
+                "win_id": None, "view_id": None,
+                "clip": EasyDiffView("**clipboard**", sublime.get_clipboard(), "UTF-8")
+            }
+        else:
+            left = LEFT
+        return left
 
     def get_right(self):
         """Get right."""
@@ -312,13 +220,20 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
         else:
             self.view = self.window.active_view()
 
-    def is_enabled(self, external=False, paths=[], group=-1, index=-1):
+    def is_enabled(self, clipboard=False, external=False, paths=[], group=-1, index=-1):
         """Check if command is enabled."""
 
-        return (
-            LEFT is not None and
-            (get_target(paths, group, index) is not None if len(paths) or index != -1 else True)
-        )
+        if clipboard:
+            enabled = (
+                bool(load_settings().get("use_clipboard", True)) and
+                (get_target(paths, group, index) is not None if len(paths) or index != -1 else True)
+            )
+        else:
+            enabled = (
+                LEFT is not None and
+                (get_target(paths, group, index) is not None if len(paths) or index != -1 else True)
+            )
+        return enabled
 
     def get_left_name(self):
         """Get left name."""
@@ -349,11 +264,16 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
                         name = basename(name)
         return name
 
-    def description(self, external=False, paths=[], group=-1, index=-1, open_file=True):
+    def description(self, external=False, clipboard=False, paths=[], group=-1, index=-1, open_file=True):
         """Return menu description."""
 
         self.set_view(paths, group, index, False)
-        if self.view is not None and self.has_selections():
+        if clipboard:
+            if self.view is not None and self.has_selections():
+                description = "%sDiff Compare Selections with Clipboard" % ('' if external else 'Easy')
+            else:
+                description = "%sDiff Compare with Clipboard" % ('' if external else 'Easy')
+        elif self.view is not None and self.has_selections():
             description = "%sDiff Compare Selections with \"%s\"" % (
                 '' if external else 'Easy',
                 self.get_left_name()
@@ -364,59 +284,6 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
                 self.get_left_name()
             )
         return description
-
-
-###############################
-# Set Clipboard
-###############################
-class EasyDiffSetLeftClipboardCommand(sublime_plugin.WindowCommand):
-    """Set left side clipboard command."""
-
-    def run(self, paths=[], group=-1, index=-1):
-        """Run command."""
-
-        global LEFT
-        LEFT = {
-            "win_id": None, "view_id": None,
-            "clip": EasyDiffView("**clipboard**", sublime.get_clipboard(), "UTF-8")
-        }
-        update_menu("**clipboard**")
-
-    def is_enabled(self, paths=[], group=-1, index=-1):
-        """Check if command is enabled."""
-
-        valid_path = get_target(paths, group, index) is not None if len(paths) or index != -1 else True
-        return bool(load_settings().get("use_clipboard", True)) and valid_path
-
-    def is_visible(self, paths=[], group=-1, index=-1):
-        """Check if command is visible."""
-
-        return bool(load_settings().get("use_clipboard", True))
-
-
-class EasyDiffCompareBothClipboardCommand(_EasyDiffCompareBothWindowCommand):
-    """Compare clipboard."""
-
-    no_view = True
-
-    def get_right(self):
-        """Get right."""
-
-        return {
-            "win_id": None, "view_id": None,
-            "clip": EasyDiffView("**clipboard**", sublime.get_clipboard(), "UTF-8")
-        }
-
-    def check_enabled(self, paths=[], group=-1, index=-1):
-        """Check if command is enabled."""
-
-        valid_path = get_target(paths, group, index) is not None if len(paths) or index != -1 else True
-        return bool(load_settings().get("use_clipboard", True)) and valid_path
-
-    def is_visible(self, external=False, paths=[], group=-1, index=-1):
-        """Check if command is visible."""
-
-        return bool(load_settings().get("use_clipboard", True))
 
 
 ###############################

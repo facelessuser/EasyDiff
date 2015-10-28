@@ -73,6 +73,10 @@ INTERNAL_MENU = '''{ "caption": "-" },
     {
         "command": "easy_diff_compare_both"
     },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true}
+    },
 '''
 
 EXTERNAL_MENU = '''{ "caption": "-" },
@@ -83,6 +87,10 @@ EXTERNAL_MENU = '''{ "caption": "-" },
     {
         "command": "easy_diff_compare_both",
         "args": {"external": true}
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "external": true}
     },
 '''
 
@@ -204,6 +212,10 @@ INTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
         "command": "easy_diff_compare_both",
         "args": {"paths": []}
     },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "paths": []}
+    },
 '''
 
 EXTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
@@ -214,6 +226,10 @@ EXTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
     {
         "command": "easy_diff_compare_both",
         "args": {"external": true, "paths": []}
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "external": true, "paths": []}
     },
 '''
 
@@ -338,6 +354,10 @@ INTERNAL_TAB_MENU = '''{ "caption": "-" },
         "command": "easy_diff_compare_both",
         "args": {"group": -1, "index": -1}
     },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "group": -1, "index": -1}
+    },
 '''
 
 EXTERNAL_TAB_MENU = '''{ "caption": "-" },
@@ -348,6 +368,10 @@ EXTERNAL_TAB_MENU = '''{ "caption": "-" },
     {
         "command": "easy_diff_compare_both",
         "args": {"external": true, "group": -1, "index": -1}
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "external": true, "group": -1, "index": -1}
     },
 '''
 
