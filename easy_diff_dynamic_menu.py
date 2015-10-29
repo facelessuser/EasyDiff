@@ -77,6 +77,9 @@ INTERNAL_MENU = '''{ "caption": "-" },
         "command": "easy_diff_compare_both",
         "args": {"clipboard": true}
     },
+    {
+        "command": "easy_diff_mru_compare"
+    },
 '''
 
 EXTERNAL_MENU = '''{ "caption": "-" },
@@ -91,6 +94,10 @@ EXTERNAL_MENU = '''{ "caption": "-" },
     {
         "command": "easy_diff_compare_both",
         "args": {"clipboard": true, "external": true}
+    },
+    {
+        "command": "easy_diff_mru_compare",
+        "args": {"external": true}
     },
 '''
 
@@ -216,6 +223,9 @@ INTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
         "command": "easy_diff_compare_both",
         "args": {"clipboard": true, "paths": []}
     },
+    {
+        "command": "easy_diff_mru_compare"
+    },
 '''
 
 EXTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
@@ -230,6 +240,10 @@ EXTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
     {
         "command": "easy_diff_compare_both",
         "args": {"clipboard": true, "external": true, "paths": []}
+    },
+    {
+        "command": "easy_diff_mru_compare",
+        "args": {"external": true}
     },
 '''
 
@@ -358,6 +372,9 @@ INTERNAL_TAB_MENU = '''{ "caption": "-" },
         "command": "easy_diff_compare_both",
         "args": {"clipboard": true, "group": -1, "index": -1}
     },
+    {
+        "command": "easy_diff_mru_compare",
+    },
 '''
 
 EXTERNAL_TAB_MENU = '''{ "caption": "-" },
@@ -372,6 +389,10 @@ EXTERNAL_TAB_MENU = '''{ "caption": "-" },
     {
         "command": "easy_diff_compare_both",
         "args": {"clipboard": true, "external": true, "group": -1, "index": -1}
+    },
+    {
+        "command": "easy_diff_mru_compare",
+        "args": {"external": true}
     },
 '''
 

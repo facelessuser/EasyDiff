@@ -112,7 +112,6 @@ def panel_enable_check(method="view", external=False):
         )
     elif method == "clipboard":
         enabled = (
-            allow and
             bool(load_settings().get("use_clipboard", True)) and
             bool(get_mru_view(EasyDiffListener.current))
         )
@@ -196,13 +195,11 @@ class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
                     "win_id": None, "view_id": None,
                     "clip": EasyDiffView("**selection**", self.get_selections(), self.get_encoding())
                 }
-                update_menu("**selection**")
             else:
                 LEFT = {"win_id": self.view.window().id(), "view_id": self.view.id(), "clip": None}
                 name = self.view.file_name()
                 if name is None:
                     name = "Untitled"
-                update_menu(basename(name))
 
     def set_view(self, paths, group=-1, index=-1, open_file=True):
         """Set view."""
@@ -226,7 +223,7 @@ class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
 
         return get_target(paths, group, index) is not None if len(paths) or index != -1 else True
 
-    def description(self, external=False, paths=[], group=-1, index=-1, open_file=True):
+    def description(self, external=False, paths=[], group=-1, index=-1):
         """Return menu description."""
 
         self.set_view(paths, group, index, False)
@@ -309,6 +306,11 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
             )
         return enabled
 
+    def is_visible(self, clipboard=False, external=False, paths=[], group=-1, index=-1):
+        """Check if visible in menu."""
+
+        return bool(load_settings().get("use_clipboard", True)) if clipboard else True
+
     def get_left_name(self):
         """Get left name."""
 
@@ -338,22 +340,22 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
                         name = basename(name)
         return name
 
-    def description(self, external=False, clipboard=False, paths=[], group=-1, index=-1, open_file=True):
+    def description(self, external=False, clipboard=False, paths=[], group=-1, index=-1):
         """Return menu description."""
 
         self.set_view(paths, group, index, False)
         if clipboard:
             if self.view is not None and bool(load_settings().get("use_selections", True)) and self.has_selections():
-                description = "%sDiff Compare Selections with Clipboard ..." % ('' if external else 'Easy')
+                description = "%sDiff Compare Selections with Clipboard" % ('' if external else 'Easy')
             else:
-                description = "%sDiff Compare with Clipboard ..." % ('' if external else 'Easy')
+                description = "%sDiff Compare with Clipboard" % ('' if external else 'Easy')
         elif self.view is not None and self.has_selections():
-            description = "%sDiff Compare Selections with \"%s\" ..." % (
+            description = "%sDiff Compare Selections with \"%s\"" % (
                 '' if external else 'Easy',
                 self.get_left_name()
             )
         else:
-            description = "%sDiff Compare with \"%s\" ..." % (
+            description = "%sDiff Compare with \"%s\"" % (
                 '' if external else 'Easy',
                 self.get_left_name()
             )
@@ -363,10 +365,10 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
 ###############################
 # MRU Tab Command
 ###############################
-class EasyDiffMruPanelCompareCommand(sublime_plugin.WindowCommand):
-    """Most recently used panel compare command."""
+class EasyDiffMruCompareCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
+    """Most recently used compare command."""
 
-    def run(self, external=False):
+    def run(self, external=False, paths=[], group=-1, index=-1):
         """Run command."""
 
         window = get_mru_window(EasyDiffListener.last[0])
@@ -386,6 +388,47 @@ class EasyDiffMruPanelCompareCommand(sublime_plugin.WindowCommand):
 
         return panel_enable_check("mru", external)
 
+    def is_visible(self, external=False, paths=[], group=-1, index=-1):
+        """Check if command is visible."""
+
+        return bool(load_settings().get("last_activated_commands", True))
+
+    def get_mru_sels(self):
+        """Get mru sels."""
+
+        mru_last_sel = False
+        mru_current_sel = False
+        if bool(load_settings().get("use_selections", True)):
+            view = get_mru_view(EasyDiffListener.last)
+            if self.view is not None:
+                mru_last_sel = self.has_selections(view)
+                view = get_mru_view(EasyDiffListener.current)
+                if self.view is not None:
+                    mru_current_sel = self.has_selections(view)
+        return mru_last_sel, mru_current_sel
+
+    def description(self, external=False, paths=[], group=-1, index=-1):
+        """Return menu description."""
+
+        view_l = get_mru_view(EasyDiffListener.last)
+        view_c = get_mru_view(EasyDiffListener.current)
+        use_selections = bool(load_settings().get("use_selections", True))
+        sel_l = "Tab"
+        sel_c = "Tab"
+
+        if view_l and use_selections:
+            self.view = view_l
+            if self.has_selections():
+                sel_l = "Selections"
+        if view_c and use_selections:
+            self.view = view_c
+            if self.has_selections():
+                sel_c = "Selections"
+        self.view = None
+
+        description = "%sDiff Last %s with Current %s" % ('' if external else 'Easy', sel_l, sel_c)
+        return description
+
 
 ###############################
 # Quick Panel Diff
@@ -401,13 +444,13 @@ class EasyDiffPanelCommand(sublime_plugin.TextCommand, _EasyDiffSelection):
             "condition": "left"
         },
         {
-            "caption": "Compare%(selections)s with %(file)s ...",
+            "caption": "Compare%(selections)s with %(file)s",
             "cmd": "easy_diff_compare_both",
             "type": "window",
             "condition": "compare"
         },
         {
-            "caption": "Quick Compare: Current %(selections)s with Clipboard ...",
+            "caption": "Quick Compare: Current %(selections)s with Clipboard",
             "cmd": "easy_diff_compare_both",
             "args": {"clipboard": True},
             "type": "window",
@@ -415,8 +458,7 @@ class EasyDiffPanelCommand(sublime_plugin.TextCommand, _EasyDiffSelection):
         },
         {
             "caption": "Quick Compare: Last %(mru_last_sel)s with Current %(mru_current_sel)s",
-            "cmd": "easy_diff_mru_panel_compare",
-            "args": {"method": "mru"},
+            "cmd": "easy_diff_mru_compare",
             "type": "window",
             "condition": "mru"
         },
@@ -593,7 +635,6 @@ class EasyDiffListener(sublime_plugin.EventListener):
         vid = view.id()
         if LEFT is not None and vid == LEFT["view_id"]:
             LEFT = None
-            update_menu()
 
     def on_activated(self, view):
         """Track last activated view."""
