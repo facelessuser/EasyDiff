@@ -65,6 +65,78 @@ def diff(left, right, external=False):
         log("Can't compare")
 
 
+def get_mru_window(win_id):
+    """Get MRU window."""
+
+    window = None
+    for w in sublime.windows():
+        if w.id() == win_id:
+            window = w
+            break
+    return window
+
+
+def get_mru_view(mru_obj):
+    """Get MRU view."""
+
+    view = None
+    if mru_obj is not None:
+        win_id, group, index, view_id = mru_obj
+        window = get_mru_window(win_id)
+        v = get_group_view(window, group, index)
+        if v.id() == view_id:
+            view = v
+    return view
+
+
+def panel_enable_check(method="view", external=False):
+    """Check if panel command can be enabled."""
+
+    allow = bool(load_settings().get("last_activated_commands", True))
+    enabled = False
+    if method == "left":
+        enabled = bool(
+            load_settings().get("quick_panel_left_right_commands", True)
+        )
+    elif method == "compare":
+        enabled = (
+            LEFT is not None and
+            bool(load_settings().get("quick_panel_left_right_commands", True))
+        )
+    elif method == "mru":
+        current = get_mru_view(EasyDiffListener.current)
+        last = get_mru_view(EasyDiffListener.last)
+        enabled = (
+            allow and
+            bool(current and last)
+        )
+    elif method == "clipboard":
+        enabled = (
+            allow and
+            bool(load_settings().get("use_clipboard", True)) and
+            bool(get_mru_view(EasyDiffListener.current))
+        )
+    elif method == "svn":
+        enabled = not bool(load_settings().get("svn_disabled", False))
+    elif method == "git":
+        enabled = not bool(load_settings().get("git_disabled", False))
+    elif method == "hg":
+        enabled = not bool(load_settings().get("hg_disabled", False))
+
+    if external:
+        enabled = (
+            enabled and
+            bool(load_settings().get("show_external", True)) and
+            get_external_diff() is not None
+        )
+    else:
+        enabled = (
+            enabled and
+            bool(load_settings().get("show_internal", True))
+        )
+    return enabled
+
+
 ###############################
 # Helper Classes
 ###############################
@@ -90,17 +162,19 @@ class _EasyDiffSelection(object):
 
         return self.view.encoding()
 
-    def has_selections(self):
+    def has_selections(self, view=None):
         """Check if view has a valid selection."""
 
+        if view is None:
+            view = self.view
         selections = False
         if bool(load_settings().get("multi_select", False)):
-            for s in self.view.sel():
+            for s in view.sel():
                 if s.size() > 0:
                     selections = True
                     break
         else:
-            selections = len(self.view.sel()) == 1 and self.view.sel()[0].size() > 0
+            selections = len(view.sel()) == 1 and view.sel()[0].size() > 0
         return selections
 
 
@@ -292,212 +366,121 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
 class EasyDiffMruPanelCompareCommand(sublime_plugin.WindowCommand):
     """Most recently used panel compare command."""
 
-    def run(self, method="view", external=False):
+    def run(self, external=False):
         """Run command."""
 
-        if method == "view":
-            self.window.run_command(
+        window = get_mru_window(EasyDiffListener.last[0])
+        view = get_mru_view(EasyDiffListener.last)
+        if view:
+            window.run_command(
                 "easy_diff_set_left",
-                {"group": EasyDiffListener.last[0], "index": EasyDiffListener.last[1]}
+                {"group": EasyDiffListener.last[1], "index": EasyDiffListener.last[2]}
             )
             self.window.run_command(
-                "easy_diff_compare_both_view",
-                {"external": external}
-            )
-        elif method == "selection":
-            self.window.run_command(
-                "easy_diff_set_left_selection",
-                {"group": EasyDiffListener.last[0], "index": EasyDiffListener.last[1]}
-            )
-            self.window.run_command(
-                "easy_diff_compare_both_selection",
-                {"external": external}
-            )
-        elif method == "clipboard":
-            self.window.run_command(
-                "easy_diff_set_left",
-                {"group": EasyDiffListener.current[0], "index": EasyDiffListener.current[1]}
-            )
-            self.window.run_command(
-                "easy_diff_compare_both_clipboard",
-                {"external": external}
-            )
-        elif method == "clipboard_selection":
-            self.window.run_command(
-                "easy_diff_set_left_selection",
-                {"group": EasyDiffListener.current[0], "index": EasyDiffListener.current[1]}
-            )
-            self.window.run_command(
-                "easy_diff_compare_both_clipboard",
+                "easy_diff_compare_both",
                 {"external": external}
             )
 
-    @staticmethod
-    def enable_check(method="view", external=False):
-        """Enable check."""
-
-        allow = bool(load_settings().get("last_activated_commands", True))
-        enabled = False
-        if method == "view":
-            enabled = (
-                allow and
-                bool(EasyDiffListener.current and EasyDiffListener.last)
-            )
-        elif method == "selection":
-            enabled = (
-                allow and
-                bool(load_settings().get("use_selections", True)) and
-                bool(EasyDiffListener.current and EasyDiffListener.last)
-            )
-        elif method == "clipboard":
-            enabled = (
-                allow and
-                bool(load_settings().get("use_clipboard", True)) and
-                bool(EasyDiffListener.last)
-            )
-        elif method == "clipboard_selection":
-            enabled = (
-                allow and
-                bool(load_settings().get("use_clipboard", True)) and
-                bool(load_settings().get("use_selections", True)) and
-                bool(EasyDiffListener.last)
-            )
-        if external:
-            enabled = (
-                enabled and
-                bool(load_settings().get("show_external", True)) and
-                get_external_diff() is not None
-            )
-        else:
-            enabled = (
-                enabled and
-                bool(load_settings().get("show_internal", True))
-            )
-        return enabled
-
-    def is_enabled(self, method="view", external=False):
+    def is_enabled(self, external=False):
         """Check if command is enabled."""
 
-        return self.enable_check(method, external)
+        return panel_enable_check("mru", external)
 
 
 ###############################
 # Quick Panel Diff
 ###############################
-PANEL_ENTRIES = [
-    {
-        "caption": "Set Left Side%(selections)s",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_set_left"
-        ),
-        "condition": lambda self, external: bool(
-            load_settings().get("quick_panel_left_right_commands", True)
-        )
-    },
-    {
-        "caption": "Compare%(selections)s with %(file)s ...",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_compare_both", {"external": external}
-        ),
-        "condition": lambda self, external: LEFT is not None and bool(
-            load_settings().get("quick_panel_left_right_commands", True)
-        )
-    },
-    {
-        "caption": "Compare%(selections)s with Clipboard ...",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_compare_both", {"clipboard": True, "external": external}
-        ),
-        "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(
-            method="clipboard", external=external
-        )
-    },
-    # {
-    #     "caption": "Compare Last Active with Current Tab",
-    #     "cmd": lambda self, external: self.view.window().run_command(
-    #         "easy_diff_mru_panel_compare", {"method": "view", "external": external}
-    #     ),
-    #     "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(
-    #         method="view", external=external
-    #     )
-    # },
-    # {
-    #     "caption": "Compare Last Active with Current Tab Selection(s)",
-    #     "cmd": lambda self, external: self.view.window().run_command(
-    #         "easy_diff_mru_panel_compare", {"method": "selection", "external": external}
-    #     ),
-    #     "condition": lambda self, external: EasyDiffMruPanelCompareCommand.enable_check(
-    #         method="selection", external=external
-    #     )
-    # },
-    {
-        "caption": "SVN Diff",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_svn", {"external": external}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("svn_disabled", False))
-    },
-    {
-        "caption": "SVN Diff with Previous Revision",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_svn", {"external": external, "last": True}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("svn_disabled", False))
-    },
-    {
-        "caption": "SVN Revert",
-        "cmd": lambda self, external: self.view.run_command(
-            "easy_diff_svn", {"revert": True}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("svn_disabled", False))
-    },
-    {
-        "caption": "GIT Diff",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_git", {"external": external}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("git_disabled", False))
-    },
-    {
-        "caption": "GIT Diff with Previous Revision",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_git", {"external": external, "last": True}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("git_disabled", False))
-    },
-    {
-        "caption": "GIT Revert",
-        "cmd": lambda self, external: self.view.run_command(
-            "easy_diff_git", {"revert": True}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("git_disabled", False))
-    },
-    {
-        "caption": "Mercurial Diff",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_hg", {"external": external}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("hg_disabled", False))
-    },
-    {
-        "caption": "Mercurial Diff with Previous Revision",
-        "cmd": lambda self, external: self.view.window().run_command(
-            "easy_diff_hg", {"external": external, "last": True}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("hg_disabled", False))
-    },
-    {
-        "caption": "Mercurial Revert",
-        "cmd": lambda self, external: self.view.run_command(
-            "easy_diff_hg", {"revert": True}
-        ),
-        "condition": lambda self, external: not bool(load_settings().get("hg_disabled", False))
-    },
-]
-
-
 class EasyDiffPanelCommand(sublime_plugin.TextCommand, _EasyDiffSelection):
     """Diff panel command."""
+
+    panel_entries = [
+        {
+            "caption": "Set Left Side%(selections)s",
+            "cmd": "easy_diff_set_left",
+            "type": "window",
+            "condition": "left"
+        },
+        {
+            "caption": "Compare%(selections)s with %(file)s ...",
+            "cmd": "easy_diff_compare_both",
+            "type": "window",
+            "condition": "compare"
+        },
+        {
+            "caption": "Quick Compare: Current %(selections)s with Clipboard ...",
+            "cmd": "easy_diff_compare_both",
+            "args": {"clipboard": True},
+            "type": "window",
+            "condition": "clipboard"
+        },
+        {
+            "caption": "Quick Compare: Last %(mru_last_sel)s with Current %(mru_current_sel)s",
+            "cmd": "easy_diff_mru_panel_compare",
+            "args": {"method": "mru"},
+            "type": "window",
+            "condition": "mru"
+        },
+        {
+            "caption": "SVN Diff",
+            "cmd": "easy_diff_svn",
+            "type": "window",
+            "condition": "svn"
+        },
+        {
+            "caption": "SVN Diff with Previous Revision",
+            "cmd": "easy_diff_svn",
+            "args": {"last": True},
+            "type": "window",
+            "condition": "svn"
+        },
+        {
+            "caption": "SVN Revert",
+            "cmd": "easy_diff_svn",
+            "args": {"revert": True},
+            "type": "view",
+            "condition": "svn"
+        },
+        {
+            "caption": "GIT Diff",
+            "cmd": "easy_diff_git",
+            "type": "window",
+            "condition": "git"
+        },
+        {
+            "caption": "GIT Diff with Previous Revision",
+            "cmd": "easy_diff_git",
+            "args": {"last": True},
+            "type": "window",
+            "condition": "git"
+        },
+        {
+            "caption": "GIT Revert",
+            "cmd": "easy_diff_git",
+            "args": {"revert": True},
+            "type": "view",
+            "condition": "git"
+        },
+        {
+            "caption": "Mercurial Diff",
+            "cmd": "easy_diff_hg",
+            "type": "window",
+            "condition": "hg"
+        },
+        {
+            "caption": "Mercurial Diff with Previous Revision",
+            "cmd": "easy_diff_hg",
+            "args": {"last": True},
+            "type": "window",
+            "condition": "hg"
+        },
+        {
+            "caption": "Mercurial Revert",
+            "cmd": "easy_diff_hg",
+            "args": {"revert": True},
+            "type": "view",
+            "condition": "hg"
+        },
+    ]
 
     def run(self, edit, external=False):
         """Run command."""
@@ -511,19 +494,43 @@ class EasyDiffPanelCommand(sublime_plugin.TextCommand, _EasyDiffSelection):
         ):
             left_name = self.get_left_name()
             selections = bool(load_settings().get("use_selections", True)) and self.has_selections()
-            for entry in PANEL_ENTRIES:
-                if entry["condition"](self, external):
+            mru_last_sel, mru_current_sel = self.get_mru_sels()
+            mru_last = " Selections" if mru_last_sel else "Tab"
+            mru_current = " Selections" if mru_current_sel else "Tab"
+            for entry in self.panel_entries:
+                if panel_enable_check(entry["condition"], external):
                     self.menu_options.append(
                         entry["caption"] % {
                             "file": left_name,
-                            "selections": ' Selections' if selections else ''
+                            "selections": ' Selections' if selections else 'Tab',
+                            "mru_last_sel": mru_last,
+                            "mru_current_sel": mru_current
                         }
                     )
-                    self.menu_callback.append(entry["cmd"])
+                    target = self.view.window() if entry["type"] == "window" else self.view
+                    args = entry.get("args", {}).copy()
+                    args["external"] = external
+                    self.menu_callback.append(
+                        lambda t=target, e=entry, a=args: t.run_command(e["cmd"], a)
+                    )
         if len(self.menu_options) > 1:
             self.view.window().show_quick_panel(self.menu_options, self.check_selection)
         elif len(self.menu_options) == 1:
             self.check_selection(0)
+
+    def get_mru_sels(self):
+        """Get mru sels."""
+
+        mru_last_sel = False
+        mru_current_sel = False
+        if bool(load_settings().get("use_selections", True)):
+            view = get_mru_view(EasyDiffListener.last)
+            if self.view is not None:
+                mru_last_sel = self.has_selections(view)
+                view = get_mru_view(EasyDiffListener.current)
+                if self.view is not None:
+                    mru_current_sel = self.has_selections(view)
+        return mru_last_sel, mru_current_sel
 
     def get_left_name(self):
         """Get left name."""
@@ -559,7 +566,7 @@ class EasyDiffPanelCommand(sublime_plugin.TextCommand, _EasyDiffSelection):
 
         if value != -1:
             callback = self.menu_callback[value]
-            sublime.set_timeout(lambda: callback(self, self.external), 0)
+            sublime.set_timeout(callback, 0)
 
     def is_enabled(self, external=False):
         """Check if command is enabled."""
@@ -590,16 +597,19 @@ class EasyDiffListener(sublime_plugin.EventListener):
 
     def on_activated(self, view):
         """Track last activated view."""
-
+        if view.settings().get('is_widget'):
+            return
         cls = EasyDiffListener
         window = view.window()
         if window is not None:
             sheet = window.active_sheet()
+            win_id = window.id()
+            view_id = view.id()
             group, index = window.get_sheet_index(sheet)
             if group != -1:
-                if (group, index) != cls.current:
+                if (win_id, group, index, view_id) != cls.current:
                     cls.last = cls.current
-                    cls.current = (group, index)
+                    cls.current = (win_id, group, index, view_id)
 
 
 ###############################
