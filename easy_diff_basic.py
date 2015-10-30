@@ -193,7 +193,7 @@ class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
             if bool(load_settings().get("use_selections", True)) and self.has_selections():
                 LEFT = {
                     "win_id": None, "view_id": None,
-                    "clip": EasyDiffView("**selection**", self.get_selections(), self.get_encoding())
+                    "clip": EasyDiffView("sel", self.get_selections(), self.get_encoding())
                 }
             else:
                 LEFT = {"win_id": self.view.window().id(), "view_id": self.view.id(), "clip": None}
@@ -228,7 +228,7 @@ class EasyDiffSetLeftCommand(sublime_plugin.WindowCommand, _EasyDiffSelection):
 
         self.set_view(paths, group, index, False)
         if self.view is not None and bool(load_settings().get("use_selections", True)) and self.has_selections():
-            description = "%sDiff Set Left Side (Selections)" % ('' if external else 'Easy')
+            description = "%sDiff Set Left Side [sel]" % ('' if external else 'Easy')
         else:
             description = "%sDiff Set Left Side" % ('' if external else 'Easy')
         return description
@@ -257,7 +257,7 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
         if self.clipboard:
             left = {
                 "win_id": None, "view_id": None,
-                "clip": EasyDiffView("**clipboard**", sublime.get_clipboard(), "UTF-8")
+                "clip": EasyDiffView("clip", sublime.get_clipboard(), "UTF-8")
             }
         else:
             left = LEFT
@@ -268,7 +268,7 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
         if self.has_selections():
             right = {
                 "win_id": None, "view_id": None,
-                "clip": EasyDiffView("**selection**", self.get_selections(), self.get_encoding())
+                "clip": EasyDiffView("sel", self.get_selections(), self.get_encoding())
             }
         else:
             right = {"win_id": self.view.window().id(), "view_id": self.view.id(), "clip": None}
@@ -314,12 +314,12 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
     def get_left_name(self):
         """Get left name."""
 
-        name = '...'
+        name = '"..."'
         if LEFT is not None:
             left = LEFT.get("clip")
             name = None
             if left is not None:
-                name = left.file_name()
+                name = "[%s]" % left.file_name()
             else:
                 win_id = LEFT.get("win_id")
                 view_id = LEFT.get("view_id")
@@ -335,9 +335,9 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
                 if view is not None:
                     name = view.file_name()
                     if name is None:
-                        name = "Untitled"
+                        name = '"Untitled"'
                     else:
-                        name = basename(name)
+                        name = '"%s"' % basename(name)
         return name
 
     def description(self, external=False, clipboard=False, paths=[], group=-1, index=-1):
@@ -346,16 +346,16 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
         self.set_view(paths, group, index, False)
         if clipboard:
             if self.view is not None and bool(load_settings().get("use_selections", True)) and self.has_selections():
-                description = "%sDiff Compare Selections with Clipboard" % ('' if external else 'Easy')
+                description = "%sDiff Compare [sel] with Clipboard" % ('' if external else 'Easy')
             else:
-                description = "%sDiff Compare with Clipboard" % ('' if external else 'Easy')
+                description = "%sDiff Compare Tab with Clipboard" % ('' if external else 'Easy')
         elif self.view is not None and self.has_selections():
-            description = "%sDiff Compare Selections with \"%s\"" % (
+            description = "%sDiff Compare [sel] with %s" % (
                 '' if external else 'Easy',
                 self.get_left_name()
             )
         else:
-            description = "%sDiff Compare with \"%s\"" % (
+            description = "%sDiff Compare with %s" % (
                 '' if external else 'Easy',
                 self.get_left_name()
             )
@@ -419,11 +419,11 @@ class EasyDiffMruCompareCommand(sublime_plugin.WindowCommand, _EasyDiffSelection
         if view_l and use_selections:
             self.view = view_l
             if self.has_selections():
-                sel_l = "Selections"
+                sel_l = "[sel]"
         if view_c and use_selections:
             self.view = view_c
             if self.has_selections():
-                sel_c = "Selections"
+                sel_c = "[sel]"
         self.view = None
 
         description = "%sDiff Last %s with Current %s" % ('' if external else 'Easy', sel_l, sel_c)
@@ -537,14 +537,14 @@ class EasyDiffPanelCommand(sublime_plugin.TextCommand, _EasyDiffSelection):
             left_name = self.get_left_name()
             selections = bool(load_settings().get("use_selections", True)) and self.has_selections()
             mru_last_sel, mru_current_sel = self.get_mru_sels()
-            mru_last = " Selections" if mru_last_sel else "Tab"
-            mru_current = " Selections" if mru_current_sel else "Tab"
+            mru_last = " [sel]" if mru_last_sel else "Tab"
+            mru_current = " [sel]" if mru_current_sel else "Tab"
             for entry in self.panel_entries:
                 if panel_enable_check(entry["condition"], external):
                     self.menu_options.append(
                         entry["caption"] % {
                             "file": left_name,
-                            "selections": ' Selections' if selections else 'Tab',
+                            "selections": ' [sel]' if selections else 'Tab',
                             "mru_last_sel": mru_last,
                             "mru_current_sel": mru_current
                         }

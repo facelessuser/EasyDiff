@@ -99,7 +99,7 @@ class EasyDiffInput(object):
 
         setattr(self, "f%d" % self.side, view.file_name())
         if external:
-            setattr(self, "f%d" % self.side, self.create_temp(view, view.file_name().replace("*", "")))
+            setattr(self, "f%d" % self.side, self.create_temp(view, view.file_name()))
         setattr(self, "t%d" % self.side, view.get_time())
 
     def set_view_buffer(self, view, external):
