@@ -84,7 +84,7 @@ def get_mru_view(mru_obj):
         win_id, group, index, view_id = mru_obj
         window = get_mru_window(win_id)
         v = get_group_view(window, group, index)
-        if v.id() == view_id:
+        if v and v.id() == view_id:
             view = v
     return view
 
