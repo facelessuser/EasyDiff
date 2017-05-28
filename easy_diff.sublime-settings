@@ -40,7 +40,7 @@
 
     // To reduce menu footprint, place diff menus under a parent item "EasyDiff"
     // (view|tab|sidebar)
-    "submenu": [],
+    "submenu": ["view", "tab", "sidebar"],
 
     // Do not perform a version check on files
     // when evaluating whether version control
