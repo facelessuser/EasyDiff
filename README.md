@@ -1,4 +1,5 @@
 [![Unix Build Status][travis-image]][travis-link]
+[![Package Control Downloads][pc-image]][pc-link]
 ![License][license-image]
 # EasyDiff
 EasyDiff is a diff tool for comparing files in Sublime Text in special diff tabs or in your preferred external diff viewer.
@@ -30,4 +31,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [travis-image]: https://img.shields.io/travis/facelessuser/EasyDiff/master.svg
 [travis-link]: https://travis-ci.org/facelessuser/EasyDiff
+[pc-image]: https://img.shields.io/packagecontrol/dt/EasyDiff.svg
+[pc-link]: https://packagecontrol.io/packages/EasyDiff
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
