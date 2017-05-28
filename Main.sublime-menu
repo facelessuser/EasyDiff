@@ -1,7 +1,5 @@
 [
     {
-        "caption": "Preferences",
-        "mnemonic": "n",
         "id": "preferences",
         "children":
         [
@@ -15,21 +13,39 @@
                         "caption": "EasyDiff",
                         "children":
                         [
+
                             {
-                                "command": "open_file", "args":
-                                {
-                                    "file": "${packages}/EasyDiff/easy_diff.sublime-settings"
-                                },
-                                "caption": "Settings – Default"
+                                "caption": "Settings",
+                                "command": "edit_settings",
+                                "args": {
+                                  "base_file": "${packages}/EasyDiff/easy_diff.sublime-settings",
+                                  "default": "// Settings in here override those in \"EasyDiff/easy_diff.sublime-settings\",\n\n{\n\t$0\n}\n"
+                                }
+                            },
+                            { "caption": "-" },
+                            {
+                                "caption": "Changelog",
+                                "command": "easy_diff_changes"
                             },
                             {
-                                "command": "open_file", "args":
-                                {
-                                    "file": "${packages}/User/easy_diff.sublime-settings"
-                                },
-                                "caption": "Settings – User"
+                                "caption": "Documentation",
+                                "command": "easy_diff_open_site",
+                                "args": {
+                                    "url": "http://facelessuser.github.io/EasyDiff/"
+                                }
                             },
-                            { "caption": "-" }
+                            { "caption": "-" },
+                            {
+                                "caption": "Support Info",
+                                "command": "easy_diff_support_info"
+                            },
+                            {
+                                "caption": "Issues",
+                                "command": "easy_diff_open_site",
+                                "args": {
+                                    "url": "https://github.com/facelessuser/EasyDiff/issues"
+                                }
+                            }
                         ]
                     }
                 ]

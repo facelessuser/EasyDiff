@@ -3,7 +3,7 @@
 # EasyDiff
 EasyDiff is a diff tool for comparing files in Sublime Text in special diff tabs or in your preferred external diff viewer.
 
-<img src="https://dl.dropboxusercontent.com/u/342698/EasyDiff/menus.png" border="0"/>
+![menus](docs/src/markdown/images/menus.png)
 
 # Features
 - Allows comparing views, selections, multi-selections, and clipboard combinations.
