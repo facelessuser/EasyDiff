@@ -1,7 +1,7 @@
 """
 Easy Diff Version Control.
 
-Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
+Copyright (c) 2013 - 2017 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import sublime
@@ -16,9 +16,9 @@ from EasyDiff.easy_diff_global import get_external_diff, get_target, notify, get
 import subprocess
 import tempfile
 
-SVN_ENABLED = False
-GIT_ENABLED = False
-HG_ENABLED = False
+SVN_ENABLED = None
+GIT_ENABLED = None
+HG_ENABLED = None
 
 
 ###############################
@@ -28,8 +28,13 @@ class _VersionControlDiff(object):
     """Version control diff base class."""
 
     control_type = ""
-    control_enabled = False
     temp_folder = None
+
+    @property
+    def control_enabled(self):
+        """Get status."""
+
+        return False
 
     def get_diff(self, name, **kwargs):
         """Get the diff."""
@@ -47,6 +52,8 @@ class _VersionControlDiff(object):
         enabled = False
         if name is not None:
             try:
+                if self.control_enabled is None:
+                    self.check_vc()
                 enabled = (
                     self.control_enabled and
                     (
@@ -227,7 +234,23 @@ class _EasyDiffSvn(_VersionControlDiff):
         """Setup important variables."""
 
         self.control_type = "SVN"
-        self.control_enabled = SVN_ENABLED
+
+    @property
+    def control_enabled(self):
+        """Check status."""
+
+        return SVN_ENABLED
+
+    def check_vc(self):
+        """Check if version control is available."""
+
+        global SVN_ENABLED
+        try:
+            log("svn %s" % svn.version())
+            SVN_ENABLED = True
+        except Exception:
+            SVN_ENABLED = False
+            log("svn not found or is not working!")
 
     def revert_file(self, name):
         """Revert file."""
@@ -279,7 +302,23 @@ class _EasyDiffGit(_VersionControlDiff):
         """Setup important variables."""
 
         self.control_type = "GIT"
-        self.control_enabled = GIT_ENABLED
+
+    @property
+    def control_enabled(self):
+        """Check status."""
+
+        return GIT_ENABLED
+
+    def check_vc(self):
+        """Check if version control is available."""
+
+        global GIT_ENABLED
+        try:
+            log("git %s" % git.version())
+            GIT_ENABLED = True
+        except Exception:
+            GIT_ENABLED = False
+            log("git not found or is not working!")
 
     def revert_file(self, name):
         """Revert the file."""
@@ -345,7 +384,23 @@ class _EasyDiffHg(_VersionControlDiff):
         """Setup important variables."""
 
         self.control_type = "HG"
-        self.control_enabled = HG_ENABLED
+
+    @property
+    def control_enabled(self):
+        """Check status."""
+
+        return HG_ENABLED
+
+    def check_vc(self):
+        """Check if version control is available."""
+
+        global HG_ENABLED
+        try:
+            log("hg %s" % hg.version())
+            HG_ENABLED = True
+        except Exception:
+            HG_ENABLED = False
+            log("hg not found or is not working!")
 
     def revert_file(self, name):
         """Revert file."""
@@ -448,26 +503,13 @@ def setup_vc_binaries():
     hg_path = multiget(settings, "hg", None)
     if svn_path is not None and svn_path != "":
         svn.set_svn_path(svn_path)
+        SVN_ENABLED = None
     if git_path is not None and git_path != "":
         git.set_git_path(git_path)
+        GIT_ENABLED = None
     if hg_path is not None and hg_path != "":
         hg.set_hg_path(hg_path)
-
-    try:
-        log("svn %s" % svn.version())
-        SVN_ENABLED = True
-    except Exception:
-        log("svn not found or is not working!")
-    try:
-        log("git %s" % git.version())
-        GIT_ENABLED = True
-    except Exception:
-        log("git not found or is not working!")
-    try:
-        log("hg %s" % hg.version())
-        HG_ENABLED = True
-    except Exception:
-        log("hg not found or is not working!")
+        HG_ENABLED = None
 
     settings.clear_on_change('reload_vc')
     settings.add_on_change('reload_vc', setup_vc_binaries)
