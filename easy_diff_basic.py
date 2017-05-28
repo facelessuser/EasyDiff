@@ -238,7 +238,7 @@ class EasyDiffCompareBothCommand(sublime_plugin.WindowCommand, _EasyDiffSelectio
     """Compare window command."""
 
     def run(self, external=False, clipboard=False, paths=[], group=-1, index=-1):
-        """run command."""
+        """Run command."""
 
         self.external = external
         self.clipboard = clipboard
