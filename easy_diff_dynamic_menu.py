@@ -68,82 +68,36 @@ VC_EXTERNAL_MENU = '''{
 ###############################
 INTERNAL_MENU = '''{ "caption": "-" },
     {
-        "caption": "EasyDiff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left"
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard"
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_set_left_selection"
-            }
-        ]
+        "command": "easy_diff_set_left"
     },
     {
-        "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view"
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard"
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_compare_both_selection"
-            }
-        ]
+        "command": "easy_diff_compare_both"
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true}
+    },
+    {
+        "command": "easy_diff_mru_compare"
     },
 '''
 
 EXTERNAL_MENU = '''{ "caption": "-" },
     {
-        "caption": "Diff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left"
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard"
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_set_left_selection"
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"external": true}
     },
     {
-        "caption": "Diff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"external": true}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"external": true}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_compare_both_selection",
-                "args": {"external": true}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"external": true}
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "external": true}
+    },
+    {
+        "command": "easy_diff_mru_compare",
+        "args": {"external": true}
     },
 '''
 
@@ -258,71 +212,38 @@ HG_EXTERNAL_MENU = '''
 ###############################
 INTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
     {
-        "caption": "EasyDiff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left",
-                "args": {"paths": []}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard",
-                "args": {"paths": []}
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"paths": []}
     },
     {
-        "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"paths": []}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"paths": []}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"paths": []}
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "paths": []}
+    },
+    {
+        "command": "easy_diff_mru_compare"
     },
 '''
 
 EXTERNAL_SIDEBAR_MENU = '''{ "caption": "-" },
     {
-        "caption": "Diff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left",
-                "args": {"paths": []}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard",
-                "args": {"paths": []}
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"external": true, "paths": []}
     },
     {
-        "caption": "Diff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"external": true, "paths": []}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"external": true, "paths": []}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"external": true, "paths": []}
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "external": true, "paths": []}
+    },
+    {
+        "command": "easy_diff_mru_compare",
+        "args": {"external": true}
     },
 '''
 
@@ -440,91 +361,38 @@ HG_SIDEBAR_EXTERNAL_MENU = '''
 ###############################
 INTERNAL_TAB_MENU = '''{ "caption": "-" },
     {
-        "caption": "EasyDiff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_set_left_selection",
-                "args": {"group": -1, "index": -1}
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"group": -1, "index": -1}
     },
     {
-        "caption": "EasyDiff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_compare_both_selection",
-                "args": {"group": -1, "index": -1}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"group": -1, "index": -1}
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "group": -1, "index": -1}
+    },
+    {
+        "command": "easy_diff_mru_compare",
     },
 '''
 
 EXTERNAL_TAB_MENU = '''{ "caption": "-" },
     {
-        "caption": "Diff Set Left Side",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_set_left",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_set_left_clipboard",
-                "args": {"group": -1, "index": -1}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_set_left_selection",
-                "args": {"group": -1, "index": -1}
-            }
-        ]
+        "command": "easy_diff_set_left",
+        "args": {"external": true, "group": -1, "index": -1}
     },
     {
-        "caption": "Diff Compare with \\"%(file_name)s\\"",
-        "children":
-        [
-            {
-                "caption": "View",
-                "command": "easy_diff_compare_both_view",
-                "args": {"external": true, "group": -1, "index": -1}
-            },
-            {
-                "caption": "Clipboard",
-                "command": "easy_diff_compare_both_clipboard",
-                "args": {"external": true, "group": -1, "index": -1}
-            },
-            {
-                "caption": "Selection",
-                "command": "easy_diff_compare_both_selection",
-                "args": {"external": true, "group": -1, "index": -1}
-            }
-        ]
+        "command": "easy_diff_compare_both",
+        "args": {"external": true, "group": -1, "index": -1}
+    },
+    {
+        "command": "easy_diff_compare_both",
+        "args": {"clipboard": true, "external": true, "group": -1, "index": -1}
+    },
+    {
+        "command": "easy_diff_mru_compare",
+        "args": {"external": true}
     },
 '''
 
@@ -689,8 +557,8 @@ class MenuUpdater(object):
             with open(menu, "w") as f:
                 f.write(
                     (DIFF_SUBMENU if submenu else DIFF_MENU) % {
-                        "internal": ("" if not self.show_int else menus["internal"] % {"file_name": self.name}),
-                        "external": ("" if not self.show_ext else menus["external"] % {"file_name": self.name}),
+                        "internal": ("" if not self.show_int else menus["internal"]),
+                        "external": ("" if not self.show_ext else menus["external"]),
                         "vc_internal": (
                             "" if vc_internal_menu is None or not self.show_int else VC_INTERNAL_MENU % {
                                 "vc": vc_internal_menu

@@ -40,7 +40,7 @@
 
     // To reduce menu footprint, place diff menus under a parent item "EasyDiff"
     // (view|tab|sidebar)
-    "submenu": [],
+    "submenu": ["view", "tab", "sidebar"],
 
     // Do not perform a version check on files
     // when evaluating whether version control
@@ -62,16 +62,15 @@
     // Each selection is separated with a new line.
     "multi_select": false,
 
+    // Show commands that use the last active
+    // tab as the left side.
+    "last_activated_commands": true,
+
     // Show Diff menu command in the command palette
     "quick_panel_commands": false,
 
     // Enable manual "set left side" and "compare" commands in the panel
     "quick_panel_left_right_commands": false,
-
-    // Show commands in the quickpanel that use the last active
-    // tab as the left side.  Selection commands will look at selections
-    // of both the last activated and current.
-    "last_activated_commands": true,
 
     // Use SubNotify plugin if installed
     "use_sub_notify": true
