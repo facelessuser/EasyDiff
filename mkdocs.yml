@@ -37,7 +37,7 @@ markdown_extensions:
   - pymdownx.inlinehilite:
   - pymdownx.magiclink:
       repo_url_shortener: true
-      base_repo_url: https://github.com/facelessuser/ExportHtml
+      base_repo_url: https://github.com/facelessuser/EasyDiff
   - pymdownx.tilde:
   - pymdownx.caret:
   - pymdownx.smartsymbols:
