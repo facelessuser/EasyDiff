@@ -1,3 +1,10 @@
+# EasyDiff 2.0.1
+
+> Released Nov 19, 2017
+
+- **FIX**: Remove workarounds.
+- **FIX**: Update dependencies to the latest.
+
 # EasyDiff 2.0.0
 
 > Released May 28, 2017
