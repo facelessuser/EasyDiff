@@ -158,7 +158,7 @@ class EasyDiffDocCommand(sublime_plugin.WindowCommand):
             import mdpopups
             import pymdownx
             has_phantom_support = (mdpopups.version() >= (1, 10, 0)) and (int(sublime.version()) >= 3124)
-            fmatter = mdpopups.format_frontmatter(frontmatter) if pymdownx.version[:3] >= (4, 3, 0) else ''
+            fmatter = mdpopups.format_frontmatter(frontmatter) if pymdownx.version_info[:3] >= (4, 3, 0) else ''
         except Exception:
             fmatter = ''
             has_phantom_support = False
@@ -197,7 +197,7 @@ class EasyDiffChangesCommand(sublime_plugin.WindowCommand):
             import mdpopups
             import pymdownx
             has_phantom_support = (mdpopups.version() >= (1, 10, 0)) and (int(sublime.version()) >= 3124)
-            fmatter = mdpopups.format_frontmatter(frontmatter) if pymdownx.version[:3] >= (4, 3, 0) else ''
+            fmatter = mdpopups.format_frontmatter(frontmatter) if pymdownx.version_info[:3] >= (4, 3, 0) else ''
         except Exception:
             fmatter = ''
             has_phantom_support = False

@@ -2,6 +2,12 @@
 
 > Released Nov 19, 2017
 
+- **FIX**: Log rendering.
+
+# EasyDiff 2.0.1
+
+> Released Nov 19, 2017
+
 - **FIX**: Remove workarounds.
 - **FIX**: Update dependencies to the latest.
 
