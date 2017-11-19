@@ -71,12 +71,6 @@ markdown_extensions:
   - pymdownx.details:
 
 extra:
-  palette:
-    primary: blue
-    accent: blue
-  font:
-    text: Roboto
-    code: Roboto Mono
   social:
     - type: github
       link: https://github.com/facelessuser
