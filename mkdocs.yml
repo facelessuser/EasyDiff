@@ -1,7 +1,22 @@
 site_name: EasyDiff Documentation
 repo_url: https://github.com/facelessuser/EasyDiff
 site_description: Diff plugin for Sublime Text.
-copyright: Copyright &copy; 2013 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
+copyright: |
+  Copyright &copy; 2013 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
+  <br><span class="md-footer-custom-text">emoji provided free by </span><a href="http://www.emojione.com">EmojiOne</a>
+
+docs_dir: docs/src/markdown
+theme:
+  name: material
+  custom_dir: docs/theme
+  palette:
+    primary: blue
+    accent: blue
+  logo:
+    icon: description
+  font:
+    text: Roboto
+    code: Roboto Mono
 
 pages:
   - User Guide: index.md
@@ -9,14 +24,10 @@ pages:
   - Contributing &amp; Support: contributing.md
   - License: license.md
 
-theme: material
-docs_dir: docs/src/markdown
-theme_dir: docs/theme
-
 markdown_extensions:
   - markdown.extensions.toc:
       slugify: !!python/name:pymdownx.slugs.uslugify
-      permalink: 
+      permalink: "\ue157"
   - markdown.extensions.admonition:
   - markdown.extensions.smarty:
       smart_quotes: false
@@ -37,7 +48,9 @@ markdown_extensions:
   - pymdownx.inlinehilite:
   - pymdownx.magiclink:
       repo_url_shortener: true
-      base_repo_url: https://github.com/facelessuser/EasyDiff
+      repo_url_shorthand: true
+      user: facelessuser
+      repo: EasyDiff
   - pymdownx.tilde:
   - pymdownx.caret:
   - pymdownx.smartsymbols:
@@ -54,8 +67,8 @@ markdown_extensions:
   - pymdownx.snippets:
       base_path: docs/src/markdown/_snippets
   - pymdownx.keys:
-      separator: ＋
-  - pymdownx.spoilers:
+      separator: "\uff0b"
+  - pymdownx.details:
 
 extra:
   palette:
@@ -68,6 +81,6 @@ extra:
     - type: github
       link: https://github.com/facelessuser
 extra_css:
-  - extra-effadd97dd.css
+  - extra-f8303dea60.css
 extra_javascript:
-  - extra-0d49409391.js
+  - extra-d8800ea088.js

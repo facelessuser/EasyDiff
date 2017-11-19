@@ -2,9 +2,9 @@
 
 ## Overview
 
-Sublime Versions | Description
----------------- | -----------
-ST3              | Fully supported and actively maintained.
+Sublime\ Versions | Description
+----------------- | -----------
+ST3               | Fully supported and actively maintained.
 
 Contribution from the community is encouraged and can be done in a variety of ways:
 
@@ -72,11 +72,21 @@ There are a couple of dependencies that must be present before running the tests
     py.test .
     ```
 
-3. Linting is performed on the entire project with `flake8`, `flake8_docstrings`, `pep8-naming`.  These can be installed via:
+3. Linting is performed on the entire project with the following modules:
+
+    - @gitlab:pycqa/flake8
+    - @gitlab:pycqa/flake8-docstrings
+    - @ebeweber/flake8-mutable
+    - @gforcada/flake8-builtins
+    - @gitlab:pycqa/pep8-naming
+
+    These can be installed via:
 
     ```
     pip install flake8
-    pip install flake8_docstrings
+    pip install flake8-docstrings
+    pip install flake8-mutable
+    pip install flake8-builtins
     pip install pep8-naming
     ```
 
@@ -90,6 +100,6 @@ There are a couple of dependencies that must be present before running the tests
 
 A ton of time has been spent not only creating and supporting this plugin, but also spent making this documentation.  If you feel it is still lacking, show your appreciation for the plugin by helping to improve the documentation.  Help with documentation is always appreciated and can be done via pull requests.  There shouldn't be any need to run validation tests if only updating documentation.
 
-You don't have to render the docs locally before pull requesting, but if you wish to, I currently use a combination of [MkDocs][mkdocs], the [Material theme][mkdocs-material], and [PyMdown Extensions][pymdown-extensions] to render the docs.  You can preview the docs if you install these two packages.  The command for previewing the docs is `mkdocs serve` from the root directory. You can then view the documents at `localhost:8000`.
+You don't have to render the docs locally before pull requesting, but if you wish to, I currently use a combination of @mkdocs/mkdocs, the @squidfunk/mkdocs-material, and @facelessuser/pymdown-extensions to render the docs.  You can preview the docs if you install these two packages.  The command for previewing the docs is `mkdocs serve` from the root directory. You can then view the documents at `localhost:8000`.
 
 --8<-- "refs.md"
