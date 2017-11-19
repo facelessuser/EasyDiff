@@ -1,4 +1,4 @@
-# EasyDiff 2.0.1
+# EasyDiff 2.0.2
 
 > Released Nov 19, 2017
 
