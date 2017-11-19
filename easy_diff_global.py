@@ -22,44 +22,15 @@ except Exception:
 
 DEBUG = False
 SETTINGS = "easy_diff.sublime-settings"
-SHEET_WORKAROUND = int(sublime.version()) < 3068
 
-if SHEET_WORKAROUND:
-    try:
-        # If TabsExtra is installed, we want to use its "get_group_view"
-        # This will keep from messing up our TabsExtra activation tracker by disabling
-        # timestamps when refocusing our view when we try to resolve sheet index
-        # with view index.
-        from TabsExtra.tabs_extra import get_group_view
-    except Exception:
-        # TabsExtra is not available.  Do not worry about activation trackers.
-        def get_group_view(window, group, index):
-            """Get the view at the given index in the given group."""
 
-            if SHEET_WORKAROUND:
-                active_sheet = window.active_sheet()
-            sheets = window.sheets_in_group(int(group))
-            sheet = sheets[index] if index < len(sheets) else None
+def get_group_view(window, group, index):
+    """Get the view at the given index in the given group."""
 
-            if SHEET_WORKAROUND:
-                view = None
-                if sheet is not None:
-                    window.focus_sheet(sheet)
-                    view = window.active_view()
-                window.focus_sheet(active_sheet)
-            else:
-                view = sheet.view() if sheet is not None else None
-
-            return view
-else:
-    def get_group_view(window, group, index):
-        """Get the view at the given index in the given group."""
-
-        sheets = window.sheets_in_group(int(group))
-        sheet = sheets[index] if index < len(sheets) else None
-        view = sheet.view() if sheet is not None else None
-
-        return view
+    sheets = window.sheets_in_group(int(group))
+    sheet = sheets[index] if index < len(sheets) else None
+    view = sheet.view() if sheet is not None else None
+    return view
 
 
 def log(msg, status=False):
