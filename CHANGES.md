@@ -1,3 +1,9 @@
+# EasyDiff 2.0.3
+
+> Released Feb 5, 2017
+
+- **FIX**: More unique name for generated version control files #26.
+
 # EasyDiff 2.0.2
 
 > Released Nov 19, 2017
