@@ -6,6 +6,7 @@ License: MIT
 """
 import sublime
 import sublime_plugin
+import os
 from os.path import basename, splitext, join, exists
 import EasyDiff.lib.svn as svn
 import EasyDiff.lib.git as git
@@ -268,11 +269,15 @@ class _EasyDiffSvn(_VersionControlDiff):
             rev = None
             if kwargs.get("last", False):
                 rev = "PREV"
-                f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
             else:
                 rev = "BASE"
-                f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
-            svn.export(f2, f1, rev=rev)
+            for x in range(1000):
+                file_path = join(self.temp_folder, "%s-r%s-LEFT-%03d%s" % (root, rev, x, ext))
+                if not os.path.exists(file_path):
+                    f1 = file_path
+                    break
+            if f1 is not None:
+                svn.export(f2, f1, rev=rev)
         else:
             log("View not versioned under SVN!", status=True)
         return f1, f2
@@ -338,11 +343,14 @@ class _EasyDiffGit(_VersionControlDiff):
                 revs = git.getrevision(f2, 2)
                 if revs is not None and len(revs) == 2:
                     rev = revs[1]
-                if rev is not None:
-                    f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
             else:
                 rev = "HEAD"
-                f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
+            if rev is not None:
+                for x in range(1000):
+                    file_path = join(self.temp_folder, "%s-r%s-LEFT-%03d%s" % (root, rev, x, ext))
+                    if not os.path.exists(file_path):
+                        f1 = file_path
+                        break
             if f1 is not None:
                 with open(f1, "wb") as f:
                     bfr = git.show(f2, rev)
@@ -420,11 +428,15 @@ class _EasyDiffHg(_VersionControlDiff):
                 revs = hg.getrevision(f2, 2)
                 if revs is not None and len(revs) == 2:
                     rev = revs[1]
-                if rev is not None:
-                    f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, rev, ext))
-            else:
-                # Leave rev as None
-                f1 = join(self.temp_folder, "%s-r%s-LEFT%s" % (root, "BASE", ext))
+            if not kwargs.get("last", False) or rev is not None:
+                for x in range(1000):
+                    if rev is not None:
+                        file_path = join(self.temp_folder, "%s-r%s-LEFT-%03d%s" % (root, rev, x, ext))
+                    else:
+                        file_path = join(self.temp_folder, "%s-rBASE-LEFT-%03d%s" % (root, x, ext))
+                    if not os.path.exists(file_path):
+                        f1 = file_path
+                        break
             if f1 is not None:
                 with open(f1, "wb") as f:
                     bfr = hg.cat(f2, rev)
