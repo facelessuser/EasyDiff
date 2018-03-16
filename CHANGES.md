@@ -1,3 +1,9 @@
+# EasyDiff 2.0.4
+
+> Released Mar X, 2018
+
+- **FIX**: Fix view index issue.
+
 # EasyDiff 2.0.3
 
 > Released Feb 5, 2017
