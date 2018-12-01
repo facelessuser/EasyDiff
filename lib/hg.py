@@ -5,11 +5,10 @@ Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import xml.etree.ElementTree as ET
-from os import environ
+import os
 import re
 import subprocess
 import sys
-from os.path import exists, dirname
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -21,6 +20,23 @@ else:
 _hg_path = "hg.exe" if _PLATFORM == "windows" else "hg"
 
 
+def which():
+    """See if executable exists."""
+
+    location = None
+    if os.path.basename(_hg_path) != _hg_path:
+        if os.path.isfile(_hg_path):
+            location = _hg_path
+    else:
+        paths = [x for x in os.environ["PATH"].split(os.pathsep) if not x.isspace()]
+        for path in paths:
+            exe = os.path.join(path, _hg_path)
+            if os.path.isfile(exe):
+                location = exe
+                break
+    return location
+
+
 def hgopen(args, cwd=None):
     """Call Git with arguments."""
 
@@ -29,7 +45,7 @@ def hgopen(args, cwd=None):
 
     cmd = [_hg_path] + args
 
-    env = environ.copy()
+    env = os.environ.copy()
     env['LC_ALL'] = 'en_US'
 
     if _PLATFORM == "windows":
@@ -66,24 +82,24 @@ def hgopen(args, cwd=None):
 def cat(target, rev=None):
     """Show file at revision."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     args = ["cat", target]
     if rev is not None:
         args += ["-r", str(rev)]
-    return hgopen(args, dirname(target))
+    return hgopen(args, os.path.dirname(target))
 
 
 def revert(target):
     """Revert file."""
 
-    assert exists(target), "%s does not exist!" % target
-    hgopen(["revert", "--no-backup", target], dirname(target))
+    assert os.path.exists(target), "%s does not exist!" % target
+    hgopen(["revert", "--no-backup", target], os.path.dirname(target))
 
 
 def getrevision(target, count=1):
     """Get revision(s)."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     results = log(target, count)
     assert results is not None, "Failed to acquire log info!"
     revs = []
@@ -97,7 +113,7 @@ def diff(target, last=False):
 
     args = None
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     if last:
         revs = getrevision(target, 2)
         if len(revs) == 2:
@@ -105,13 +121,13 @@ def diff(target, last=False):
     else:
         args = ["diff", "-p"]
 
-    return hgopen(args + [target], dirname(target)) if args is not None else b""
+    return hgopen(args + [target], os.path.dirname(target)) if args is not None else b""
 
 
 def log(target=None, limit=0):
     """Get hg log."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
 
     args = ["log", "--style=xml"]
     if limit != 0:
@@ -119,7 +135,7 @@ def log(target=None, limit=0):
         args.append(str(limit))
     if target is not None:
         args.append(target)
-    output = hgopen(args, dirname(target))
+    output = hgopen(args, os.path.dirname(target))
 
     if output != "":
         results = ET.fromstring(output)
@@ -132,7 +148,7 @@ def log(target=None, limit=0):
 def is_versioned(target):
     """Check if file/folder is versioned."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     versioned = False
     try:
         results = log(target, 1)

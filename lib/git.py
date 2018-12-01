@@ -5,11 +5,10 @@ Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 # import xml.etree.ElementTree as ET
-from os import environ
+import os
 import re
 import subprocess
 import sys
-from os.path import exists, isfile, dirname, join
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -23,6 +22,23 @@ _git_path = "git.exe" if _PLATFORM == "windows" else "git"
 # UNSTAGED_DIFF = 0
 # STAGED_DIFF = 1
 # ALL_DIFF = 2
+
+
+def which():
+    """See if executable exists."""
+
+    location = None
+    if os.path.basename(_git_path) != _git_path:
+        if os.path.isfile(_git_path):
+            location = _git_path
+    else:
+        paths = [x for x in os.environ["PATH"].split(os.pathsep) if not x.isspace()]
+        for path in paths:
+            exe = os.path.join(path, _git_path)
+            if os.path.isfile(exe):
+                location = exe
+                break
+    return location
 
 
 def is_system_root(target):
@@ -42,21 +58,21 @@ def get_git_tree(target):
     """Recursively get Git tree."""
 
     root = is_system_root(target)
-    is_file = isfile(target)
-    folder = dirname(target) if is_file else target
-    if exists(join(folder, ".git")):
+    is_file = os.path.isfile(target)
+    folder = os.path.dirname(target) if is_file else target
+    if os.path.exists(os.path.join(folder, ".git")):
         return folder
     else:
         if root:
             return None
         else:
-            return get_git_tree(dirname(folder))
+            return get_git_tree(os.path.dirname(folder))
 
 
 def get_git_dir(tree):
     """Get Git directory from tree."""
 
-    return join(tree, ".git")
+    return os.path.join(tree, ".git")
 
 
 def gitopen(args, git_tree=None):
@@ -70,7 +86,7 @@ def gitopen(args, git_tree=None):
     else:
         cmd = [_git_path] + args
 
-    env = environ.copy()
+    env = os.environ.copy()
     env['LC_ALL'] = 'en_US'
 
     if _PLATFORM == "windows":
@@ -105,7 +121,7 @@ def gitopen(args, git_tree=None):
 def show(target, rev):
     """Show file at revision."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
     bfr = None
     target = target.replace(git_tree, "", 1).lstrip("\\" if _PLATFORM == "windows" else "/")
@@ -120,7 +136,7 @@ def show(target, rev):
 def getrevision(target, count=1):
     """Get revision(s)."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
     revs = None
 
@@ -135,7 +151,7 @@ def getrevision(target, count=1):
 def checkout(target, rev=None):
     """Checkout file."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
 
     if git_tree is not None:
@@ -150,7 +166,7 @@ def checkout(target, rev=None):
 def diff(target, last=False):
     """Diff current file against last revision."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     # assert diff_type in [ALL_DIFF, STAGED_DIFF, UNSTAGED_DIFF], "diff_type is bad!"
     git_tree = get_git_tree(target)
     results = b""
@@ -180,7 +196,7 @@ def diff(target, last=False):
 def is_versioned(target):
     """Check if file/folder is versioned."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     git_tree = get_git_tree(target)
 
     versioned = False
