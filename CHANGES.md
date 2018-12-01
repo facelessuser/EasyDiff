@@ -1,31 +1,25 @@
-# EasyDiff 2.0.4
+# EasyDiff 2.0.5
 
-> Released Mar 16, 2018
+- **FIX**: Lag during version control binary check.
+
+# EasyDiff 2.0.4
 
 - **FIX**: Fix view index issue.
 
 # EasyDiff 2.0.3
 
-> Released Feb 5, 2017
-
 - **FIX**: More unique name for generated version control files #26.
 
 # EasyDiff 2.0.2
-
-> Released Nov 19, 2017
 
 - **FIX**: Log rendering.
 
 # EasyDiff 2.0.1
 
-> Released Nov 19, 2017
-
 - **FIX**: Remove workarounds.
 - **FIX**: Update dependencies to the latest.
 
 # EasyDiff 2.0.0
-
-> Released May 28, 2017
 
 - **NEW**: Add new support commands.
 - **NEW**: Reduce menus down to a few commands.
