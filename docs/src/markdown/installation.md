@@ -215,4 +215,4 @@ For those who want to install EasyDiff without package control, here are the ste
 
 3. Restart Sublime Text.
 
---8<-- "refs.md"
+--8<-- "refs.txt"

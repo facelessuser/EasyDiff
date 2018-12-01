@@ -192,4 +192,4 @@ Occasionally, EasyDiff will about a message in the status bar. You can redirect 
     "use_sub_notify": true
 ```
 
---8<-- "refs.md"
+--8<-- "refs.txt"

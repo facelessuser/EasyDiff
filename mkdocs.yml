@@ -2,7 +2,7 @@ site_name: EasyDiff Documentation
 repo_url: https://github.com/facelessuser/EasyDiff
 site_description: Diff plugin for Sublime Text.
 copyright: |
-  Copyright &copy; 2013 - 2017 <a href="https://github.com/facelessuser">Isaac Muse</a>
+  Copyright &copy; 2013 - 2018 <a href="https://github.com/facelessuser">Isaac Muse</a>
   <br><span class="md-footer-custom-text">emoji provided free by </span><a href="http://www.emojione.com">EmojiOne</a>
 
 docs_dir: docs/src/markdown
@@ -18,7 +18,7 @@ theme:
     text: Roboto
     code: Roboto Mono
 
-pages:
+nav:
   - User Guide: index.md
   - Installation: installation.md
   - Contributing &amp; Support: contributing.md
@@ -36,8 +36,20 @@ markdown_extensions:
   - markdown.extensions.def_list:
   - markdown.extensions.tables:
   - markdown.extensions.abbr:
+  - markdown.extensions.footnotes:
   - pymdownx.extrarawhtml:
   - pymdownx.superfences:
+      preserve_tabs: true
+      custom_fences: 
+        - name: flow
+          class: uml-flowchart
+          format: !!python/name:pymdownx.superfences.fence_code_format
+        - name: sequence
+          class: uml-sequence-diagram
+          format: !!python/name:pymdownx.superfences.fence_code_format
+        - name: math
+          class: arithmatex
+          format: !!python/name:pymdownx.arithmatex.fence_mathjax_format
   - pymdownx.highlight:
       css_class: codehilite
       extend_pygments_lang:
@@ -45,10 +57,19 @@ markdown_extensions:
           lang: php
           options:
             startinline: true
+        - name: pycon3
+          lang: pycon
+          options:
+            python3: true
   - pymdownx.inlinehilite:
+      custom_inline:
+        - name: math
+          class: arithmatex
+          format: !!python/name:pymdownx.arithmatex.inline_mathjax_format
   - pymdownx.magiclink:
       repo_url_shortener: true
       repo_url_shorthand: true
+      social_url_shorthand: true
       user: facelessuser
       repo: EasyDiff
   - pymdownx.tilde:
@@ -62,8 +83,7 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.progressbar:
-  - pymdownx.plainhtml:
-      strip_attributes: ''
+  - pymdownx.striphtml:
   - pymdownx.snippets:
       base_path: docs/src/markdown/_snippets
   - pymdownx.keys:
@@ -75,6 +95,6 @@ extra:
     - type: github
       link: https://github.com/facelessuser
 extra_css:
-  - extra-f8303dea60.css
+  - extra-83f68d2c59.css
 extra_javascript:
-  - extra-d8800ea088.js
+  - extra-0b9b22dd13.js
