@@ -5,7 +5,7 @@ import textwrap
 import webbrowser
 import re
 
-__version__ = "2.0.4"
+__version__ = "2.0.5"
 __pc_name__ = 'EasyDiff'
 
 CSS = '''

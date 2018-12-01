@@ -246,12 +246,13 @@ class _EasyDiffSvn(_VersionControlDiff):
         """Check if version control is available."""
 
         global SVN_ENABLED
-        try:
-            log("svn %s" % svn.version())
+        location = svn.which()
+        log("svn %s" % location)
+        if location is not None:
             SVN_ENABLED = True
-        except Exception:
+        else:
             SVN_ENABLED = False
-            log("svn not found or is not working!")
+            log("svn not found!")
 
     def revert_file(self, name):
         """Revert file."""
@@ -318,12 +319,13 @@ class _EasyDiffGit(_VersionControlDiff):
         """Check if version control is available."""
 
         global GIT_ENABLED
-        try:
-            log("git %s" % git.version())
+        location = git.which()
+        log("git %s" % location)
+        if location is not None:
             GIT_ENABLED = True
-        except Exception:
+        else:
             GIT_ENABLED = False
-            log("git not found or is not working!")
+            log("git not found!")
 
     def revert_file(self, name):
         """Revert the file."""
@@ -403,12 +405,13 @@ class _EasyDiffHg(_VersionControlDiff):
         """Check if version control is available."""
 
         global HG_ENABLED
-        try:
-            log("hg %s" % hg.version())
+        location = hg.which()
+        log("hg %s" % location)
+        if location is not None:
             HG_ENABLED = True
-        except Exception:
+        else:
             HG_ENABLED = False
-            log("hg not found or is not working!")
+            log("hg not found!")
 
     def revert_file(self, name):
         """Revert file."""

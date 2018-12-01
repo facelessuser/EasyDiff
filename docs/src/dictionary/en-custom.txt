@@ -4,6 +4,7 @@ Ctrl
 DeltaWalker
 EasyDiff
 EasyDiff's
+EmojiOne
 Feb
 MERCHANTABILITY
 MkDocs

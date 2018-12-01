@@ -5,11 +5,10 @@ Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
 import xml.etree.ElementTree as ET
-from os import environ
+import os
 import re
 import subprocess
 import sys
-from os.path import exists, isfile
 
 NO_LOCK = 0
 LOCAL_LOCK = 1
@@ -26,6 +25,23 @@ else:
 _svn_path = "svn.exe" if _PLATFORM == "windows" else "svn"
 
 
+def which():
+    """See if executable exists."""
+
+    location = None
+    if os.path.basename(_svn_path) != _svn_path:
+        if os.path.isfile(_svn_path):
+            location = _svn_path
+    else:
+        paths = [x for x in os.environ["PATH"].split(os.pathsep) if not x.isspace()]
+        for path in paths:
+            exe = os.path.join(path, _svn_path)
+            if os.path.isfile(exe):
+                location = exe
+                break
+    return location
+
+
 def svnopen(args):
     """Call SVN with arguments."""
 
@@ -33,7 +49,7 @@ def svnopen(args):
     output = None
     cmd = [_svn_path, "--non-interactive"] + args
 
-    env = environ.copy()
+    env = os.environ.copy()
     env['LC_ALL'] = 'en_US'
 
     if _PLATFORM == "windows":
@@ -68,7 +84,7 @@ def svnopen(args):
 def revert(target):
     """Revert file."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
     svnopen(["revert", target])
 
 
@@ -77,7 +93,7 @@ def info(target):
 
     assert (
         (target.startswith("http://") or target.startswith("https://")) or
-        exists(target)
+        os.path.exists(target)
     ), "%s does not exist!" % target
     output = svnopen(['info', "--xml", target])
     return ET.fromstring(output)
@@ -138,15 +154,15 @@ def getrevision(pth):
 def diff(target, last=False):
     """Get SVN diff of last version."""
 
-    assert exists(target), "%s does not exist!" % target
-    assert isfile(target), "%s is not a file!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
+    assert os.path.isfile(target), "%s is not a file!" % target
     return svnopen(['diff', '-rPREV', target]) if last else svnopen(['diff', target])
 
 
 def commit(pth, msg=""):
     """Commit changes."""
 
-    assert exists(pth), "%s does not exist!" % pth
+    assert os.path.exists(pth), "%s does not exist!" % pth
     svnopen(["commit", pth, "-m", msg])
 
 
@@ -188,14 +204,14 @@ def checklock(pth):
 def lock(pth):
     """Lock file."""
 
-    assert exists(pth), "%s does not exist!" % pth
+    assert os.path.exists(pth), "%s does not exist!" % pth
     svnopen(['lock', pth])
 
 
 def breaklock(pth, force=False):
     """Breack file lock."""
 
-    assert exists(pth), "%s does not exist!" % pth
+    assert os.path.exists(pth), "%s does not exist!" % pth
 
     args = ['unlock']
     if force:
@@ -210,13 +226,13 @@ def checkout(url, pth):
     """Checkout SVN url."""
 
     svnopen(['checkout', url, pth])
-    assert exists(pth)
+    assert os.path.exists(pth)
 
 
 def update(pth):
     """Update SVN directory."""
 
-    assert exists(pth), "%s does not exist!" % pth
+    assert os.path.exists(pth), "%s does not exist!" % pth
     svnopen(['update', pth])
 
 
@@ -229,27 +245,27 @@ def export(url, name, rev=None):
     args += [url, name]
 
     svnopen(args)
-    assert exists(name), "%s appears to not have been exported!" % name
+    assert os.path.exists(name), "%s appears to not have been exported!" % name
 
 
 def add(pth):
     """Add a file."""
 
-    assert exists(pth), "%s does not exist!" % pth
+    assert os.path.exists(pth), "%s does not exist!" % pth
     svnopen(['add', pth])
 
 
 def cleanup(pth):
     """Clean up a folder."""
 
-    assert exists(pth), "%s does not exist!" % pth
+    assert os.path.exists(pth), "%s does not exist!" % pth
     svnopen(['cleanup', pth])
 
 
 def status(pth, ignore_externals=False, ignore_unversioned=False, depth="infinity"):
     """Get the SVN status for the folder."""
 
-    assert exists(pth), "%s does not exist!" % pth
+    assert os.path.exists(pth), "%s does not exist!" % pth
 
     attributes = {
         "added": [],
@@ -301,7 +317,7 @@ def status(pth, ignore_externals=False, ignore_unversioned=False, depth="infinit
 def is_versioned(target):
     """Check if file/folder is versioned."""
 
-    assert exists(target), "%s does not exist!" % target
+    assert os.path.exists(target), "%s does not exist!" % target
 
     versioned = False
     try:
