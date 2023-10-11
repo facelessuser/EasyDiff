@@ -93,24 +93,6 @@ class EasyDiffSupportInfoCommand(sublime_plugin.ApplicationCommand):
         except Exception:
             info["mdpopups_version"] = 'Version could not be acquired!'
 
-        try:
-            import markdown
-            info["markdown_version"] = format_version(markdown, 'version')
-        except Exception:
-            info["markdown_version"] = 'Version could not be acquired!'
-
-        try:
-            import jinja2
-            info["jinja_version"] = format_version(jinja2, '__version__')
-        except Exception:
-            info["jinja_version"] = 'Version could not be acquired!'
-
-        try:
-            import pygments
-            info["pygments_version"] = format_version(pygments, '__version__')
-        except Exception:
-            info["pygments_version"] = 'Version could not be acquired!'
-
         msg = textwrap.dedent(
             """\
             - ST ver.: %(version)s
@@ -119,9 +101,6 @@ class EasyDiffSupportInfoCommand(sublime_plugin.ApplicationCommand):
             - Plugin ver.: %(plugin_version)s
             - Install via PC: %(pc_install)s
             - mdpopups ver.: %(mdpopups_version)s
-            - markdown ver.: %(markdown_version)s
-            - pygments ver.: %(pygments_version)s
-            - jinja2 ver.: %(jinja_version)s
             """ % info
         )
 
@@ -156,7 +135,7 @@ class EasyDiffDocCommand(sublime_plugin.WindowCommand):
 
         try:
             import mdpopups
-            import pymdownx
+            from mdpopups import pymdownx
             has_phantom_support = (mdpopups.version() >= (1, 10, 0)) and (int(sublime.version()) >= 3124)
             fmatter = mdpopups.format_frontmatter(frontmatter) if pymdownx.version_info[:3] >= (4, 3, 0) else ''
         except Exception:
@@ -195,7 +174,7 @@ class EasyDiffChangesCommand(sublime_plugin.WindowCommand):
         """Show the changelog in a new view."""
         try:
             import mdpopups
-            import pymdownx
+            from mdpopups import pymdownx
             has_phantom_support = (mdpopups.version() >= (1, 10, 0)) and (int(sublime.version()) >= 3124)
             fmatter = mdpopups.format_frontmatter(frontmatter) if pymdownx.version_info[:3] >= (4, 3, 0) else ''
         except Exception:
