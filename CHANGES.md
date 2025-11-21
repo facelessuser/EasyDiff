@@ -1,29 +1,35 @@
-# EasyDiff 2.0.5
+# EasyDiff
 
-- **FIX**: Lag during version control binary check.
+# 2.0.6
 
-# EasyDiff 2.0.4
+-   **FIX**: Ensure `typing` dependency is included for Python 3.3.
 
-- **FIX**: Fix view index issue.
+# 2.0.5
 
-# EasyDiff 2.0.3
+-   **FIX**: Lag during version control binary check.
 
-- **FIX**: More unique name for generated version control files #26.
+# 2.0.4
 
-# EasyDiff 2.0.2
+-   **FIX**: Fix view index issue.
 
-- **FIX**: Log rendering.
+# 2.0.3
 
-# EasyDiff 2.0.1
+-   **FIX**: More unique name for generated version control files #26.
 
-- **FIX**: Remove workarounds.
-- **FIX**: Update dependencies to the latest.
+# 2.0.2
 
-# EasyDiff 2.0.0
+-   **FIX**: Log rendering.
 
-- **NEW**: Add new support commands.
-- **NEW**: Reduce menus down to a few commands.
-- **NEW**: Check version control binaries on first call to them instead of at plugin load.
-- **NEW**: If a selection or selections exist, set left will use the selections. If no selections are available, the  
-entire file/view will be used.
-- **NEW**: Ability to control whether menus are nested under a parent entry to decrease top level menu footprint.
+# 2.0.1
+
+-   **FIX**: Remove workarounds.
+-   **FIX**: Update dependencies to the latest.
+
+# 2.0.0
+
+-   **NEW**: Add new support commands.
+-   **NEW**: Reduce menus down to a few commands.
+-   **NEW**: Check version control binaries on first call to them instead of at plugin load.
+-   **NEW**: If a selection or selections exist, set left will use the selections. If no selections are available, the  
+    entire file/view will be used.
+-   **NEW**: Ability to control whether menus are nested under a parent entry to decrease top level menu footprint.
