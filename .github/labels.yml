@@ -4,7 +4,6 @@ template: 'facelessuser:master-labels:labels.yml:master'
 
 brace_expansion: true
 extended_glob: true
-minus_negate: false
 
 rules:
   - labels: ['C: infrastructure']
