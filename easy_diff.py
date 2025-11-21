@@ -29,7 +29,7 @@ class EasyDiffView(object):
         self.encode = encoding
 
     def encoding(self):
-        """Return enconding."""
+        """Return encoding."""
 
         return self.encode
 

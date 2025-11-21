@@ -134,7 +134,7 @@ def searchinfo(xml, *args):
 
 
 def geturl(pth):
-    """Get SVN url from file."""
+    """Get SVN URL from file."""
 
     output = info(pth)
     search_targets = ["url"]
@@ -209,7 +209,7 @@ def lock(pth):
 
 
 def breaklock(pth, force=False):
-    """Breack file lock."""
+    """Break file lock."""
 
     assert os.path.exists(pth), "%s does not exist!" % pth
 
@@ -223,7 +223,7 @@ def breaklock(pth, force=False):
 
 
 def checkout(url, pth):
-    """Checkout SVN url."""
+    """Checkout SVN URL."""
 
     svnopen(['checkout', url, pth])
     assert os.path.exists(pth)

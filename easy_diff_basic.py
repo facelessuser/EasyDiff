@@ -394,7 +394,7 @@ class EasyDiffMruCompareCommand(sublime_plugin.WindowCommand, _EasyDiffSelection
         return bool(load_settings().get("last_activated_commands", True))
 
     def get_mru_sels(self):
-        """Get mru sels."""
+        """Get MRU selections."""
 
         mru_last_sel = False
         mru_current_sel = False
@@ -561,7 +561,7 @@ class EasyDiffPanelCommand(sublime_plugin.TextCommand, _EasyDiffSelection):
             self.check_selection(0)
 
     def get_mru_sels(self):
-        """Get mru sels."""
+        """Get MRU selections."""
 
         mru_last_sel = False
         mru_current_sel = False

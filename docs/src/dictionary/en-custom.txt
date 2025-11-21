@@ -1,3 +1,4 @@
+Changelog
 Cmd
 Control's
 Ctrl
@@ -6,15 +7,21 @@ EasyDiff
 EasyDiff's
 EmojiOne
 Feb
+JSON
 MERCHANTABILITY
+MRU
 MkDocs
+Multiconf
 NONINFRINGEMENT
 OS's
 PyMdown
 SVN
 SubNotify
+Twemoji
 UI
+biermeester
 builtins
+changelog
 docstrings
 ebeweber
 everyone's
@@ -24,6 +31,7 @@ installable
 jinja
 macOS
 markupsafe
+matthjes
 mkdocs
 multi
 packagecontrol

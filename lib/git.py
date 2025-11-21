@@ -4,7 +4,7 @@ Git.
 Copyright (c) 2013 - 2015 Isaac Muse <isaacmuse@gmail.com>
 License: MIT
 """
-# import xml.etree.ElementTree as ET
+# `import xml.etree.ElementTree as ET`
 import os
 import re
 import subprocess
@@ -19,9 +19,11 @@ else:
 
 _git_path = "git.exe" if _PLATFORM == "windows" else "git"
 
+# ```
 # UNSTAGED_DIFF = 0
 # STAGED_DIFF = 1
 # ALL_DIFF = 2
+# ```
 
 
 def which():
@@ -167,7 +169,7 @@ def diff(target, last=False):
     """Diff current file against last revision."""
 
     assert os.path.exists(target), "%s does not exist!" % target
-    # assert diff_type in [ALL_DIFF, STAGED_DIFF, UNSTAGED_DIFF], "diff_type is bad!"
+    # `assert diff_type in [ALL_DIFF, STAGED_DIFF, UNSTAGED_DIFF], "diff_type is bad!"`
     git_tree = get_git_tree(target)
     results = b""
 
@@ -184,9 +186,11 @@ def diff(target, last=False):
         else:
             args += ["HEAD", "--"]
 
+        # ```
         # Staged only
         # elif diff_type == STAGED_DIFF:
         #     args.append("--cached")
+        # ```
 
         if args:
             results = gitopen(args + [target], git_tree)

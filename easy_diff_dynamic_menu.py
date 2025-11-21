@@ -669,7 +669,7 @@ def update_menu(name="..."):
 # Loaders
 ###############################
 def refresh_menu():
-    """Refresh teh menus."""
+    """Refresh the menus."""
 
     update_menu()
     debug("refresh menu")

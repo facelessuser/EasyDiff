@@ -125,7 +125,7 @@ def diff(target, last=False):
 
 
 def log(target=None, limit=0):
-    """Get hg log."""
+    """Get `hg` log."""
 
     assert os.path.exists(target), "%s does not exist!" % target
 
@@ -162,7 +162,7 @@ def is_versioned(target):
 
 
 def version():
-    """Get hg app version."""
+    """Get `hg` app version."""
 
     version = None
     output = hgopen(['--version'])
@@ -173,7 +173,7 @@ def version():
 
 
 def set_hg_path(pth):
-    """Set hg path."""
+    """Set `hg` path."""
 
     global _hg_path
     _hg_path = pth
