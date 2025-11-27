@@ -1,5 +1,9 @@
 # EasyDiff
 
+# 2.1.0
+
+-   **NEW**: Changes to support Python 3.13 in ST 4201+.
+
 # 2.0.6
 
 -   **FIX**: Ensure `typing` dependency is included for Python 3.3.
